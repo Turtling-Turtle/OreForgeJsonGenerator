@@ -1,10 +1,10 @@
 # @author Nathan Ulmen
 from Helper_Functions import prompt_for_int
-from Upgrade_Strategies import Strategy
+from Upgrade_Strategies import StringIntPair
 
-BundledEffect = Strategy("BundledEffect", 0)
-Inflamed = Strategy("Inflamed", 1)
-FrostBite = Strategy("FrostBite", 2)
+BundledEffect = StringIntPair("BundledEffect", 0)
+Inflamed = StringIntPair("Inflamed", 1)
+FrostBite = StringIntPair("FrostBite", 2)
 ## Can add more strategies once I create them in the actual project. Currently, these are all I have.
 
 effects = [BundledEffect, Inflamed, FrostBite]

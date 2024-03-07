@@ -1,5 +1,12 @@
 # @author Nathan Ulmen
 
+class StringIntPair:
+    def __init__(self, name, associated_value, description):
+        self.name = name
+        self.associated_value = associated_value
+        self.description = description
+
+
 class color:
     PURPLE = '\033[95m'
     CYAN = '\033[96m'
@@ -14,21 +21,15 @@ class color:
     END = '\033[0m'
 
 
-class Tier:
-    def __init__(self, name, associated_value):
-        self.name = name
-        self.associated_value = associated_value
-
-
-PINNACLE = Tier(color.RED + "PINNACLE" + color.END, 0)
-SPECIAL = Tier(color.ORANGE + "SPECIAL" + color.END, 1)
-EXOTIC = Tier(color.YELLOW + "EXOTIC" + color.END, 2)
-PRESTIGE = Tier(color.CYAN + "PRESTIGE" + color.END, 3)
-EPIC = Tier(color.PURPLE + "EPIC" + color.END, 4)
-SUPER_RARE = Tier(color.DARKCYAN + "SUPER_RARE" + color.END, 5)
-RARE = Tier(color.BLUE + "RARE" + color.END, 6)
-UNCOMMON = Tier(color.GREEN + "UNCOMMON" + color.END, 7)
-COMMON = Tier("COMMON", 8)
+PINNACLE = StringIntPair(color.RED + "PINNACLE" + color.END, 0, "")
+SPECIAL = StringIntPair(color.ORANGE + "SPECIAL" + color.END, 1, '')
+EXOTIC = StringIntPair(color.YELLOW + "EXOTIC" + color.END, 2, '')
+PRESTIGE = StringIntPair(color.CYAN + "PRESTIGE" + color.END, 3, '')
+EPIC = StringIntPair(color.PURPLE + "EPIC" + color.END, 4, '')
+SUPER_RARE = StringIntPair(color.DARKCYAN + "SUPER_RARE" + color.END, 5, '')
+RARE = StringIntPair(color.BLUE + "RARE" + color.END, 6, '')
+UNCOMMON = StringIntPair(color.GREEN + "UNCOMMON" + color.END, 7, '')
+COMMON = StringIntPair("COMMON", 8, '')
 
 validTiers = []
 validTiers.append(PINNACLE)
@@ -43,6 +44,7 @@ validTiers.append(COMMON)
 
 
 def prompt_for_tier(item_type):
+    print()
     while True:
         print()
         for tier in validTiers:
@@ -52,16 +54,18 @@ def prompt_for_tier(item_type):
         for tier in validTiers:
             if tier.associated_value == user_input:
                 return remove_color(tier.name)  # Need to remove color before printing to Json
-        print(user_input,  " is not a valid input.")
+        print(user_input, " is not a valid input.")
 
 
 def prompt_for_string(prompt):
-    return input(prompt)
+    print()
+    return input(color.BOLD + prompt + color.END)
 
 
 def prompt_for_float(prompt):
+    print()
     while True:
-        user_input = input(prompt)
+        user_input = input(color.BOLD + prompt + color.END)
         try:
             user_input = float(user_input)
             return user_input
@@ -70,8 +74,9 @@ def prompt_for_float(prompt):
 
 
 def prompt_for_int(prompt):
+    print()
     while True:
-        user_input = input(prompt)
+        user_input = input(color.BOLD + prompt + color.END)
         try:
             user_input = int(user_input)
             return user_input
@@ -80,8 +85,9 @@ def prompt_for_int(prompt):
 
 
 def prompt_for_boolean(prompt):
+    print()
     while True:
-        user_input = input(prompt + "\n Enter 't' for true, 'f' for false: ")
+        user_input = input(color.BOLD + prompt + "\n Enter 't' for true, 'f' for false: " + color.END)
         if user_input.lower() == 't':
             return True
         elif user_input.lower() == 'f':
@@ -98,22 +104,21 @@ def remove_color(string):
             string = string.replace(value, '')
     return string
 
-class ValueToModify:
-    def __init__(self, name, associated_value):
-        self.name = name
-        self.associated_value = associated_value
 
-ORE_VALUE = ValueToModify("ORE_VALUE", 0)
-TEMPERATURE = ValueToModify("TEMPERATURE", 1)
-MULTIORE = ValueToModify("MULTIORE", 2)
+ORE_VALUE = StringIntPair("ORE_VALUE", 0, '')
+TEMPERATURE = StringIntPair("TEMPERATURE", 1, '')
+MULTIORE = StringIntPair("MULTIORE", 2, '')
 
 vtm = [ORE_VALUE, TEMPERATURE, MULTIORE]
 
-def prompt_for_vtm():
+
+def prompt_for_vtm(upg_type):
+    print()
     while True:
         for value in vtm:
-            print(value.associated_value, value.name)
-        user_input = prompt_for_int("Which of those values would you like this effect to modify?")
+            print(value.associated_value, '-', value.name)
+        user_input = prompt_for_int(
+            color.BOLD + "Which of those values would you like " + upg_type + " to modify? " + color.END)
         for value in vtm:
             if user_input == value.associated_value:
                 return value.name

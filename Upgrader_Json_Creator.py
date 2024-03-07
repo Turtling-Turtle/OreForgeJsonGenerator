@@ -1,6 +1,8 @@
+#Line 1
 #@author Nathan Ulmen
 import json
-from Helper_Functions import prompt_for_string, prompt_for_tier, prompt_for_float, prompt_for_boolean, prompt_for_vtm
+from Helper_Functions import prompt_for_string, prompt_for_tier, prompt_for_float, prompt_for_boolean
+from Upgrade_Strategies import prompt_for_upg_type
 
 print("Welcome, you are creating a new Upgrader. Enter the values to print the Upgrader to Json.")
 
@@ -14,30 +16,16 @@ upgrader_data = {
     #     {0, 1, 1, 0}
     # ],
     "tier": prompt_for_tier("Upgrader"),
+    "isShopItem": prompt_for_boolean("Is the Upgrader a bought with Cash? "),
     "itemValue": prompt_for_float("Enter the Upgraders value/price: "),
     "conveyorSpeed": prompt_for_float("Enter the Upgraders conveyor speed: "),
-    # "upgrade": {
-    #     "type": "BundledUPG",
-    #     "upgStrat1": {
-    #         "type": "ResetterUPG"
-    #     },
-    #     "upgStrat2": {
-    #         "type": "InfluencedUPG",
-    #         "modifier": prompt_for_float("Enter the effects modifier: "),
-    #         "ValueToModify": prompt_for_vtm(),
-    #         "ValueOfInfluence": "UPGRADE_COUNT"
-    #     },
-    #     "upgStrat3": {
-    #         "type": null
-    #     },
-    #     "upgStrat4": {
-    #         "type": null
-    #     }
-    # },
+    "upgrade": {
+        "type": prompt_for_upg_type("the primary upgrade"),
+    },
     "upgradeTag": {
         "name": name,
         "maxUpgrades": 1,
-        "isResetter": prompt_for_boolean("Does this Upgrader rest Ore?")
+        "isResetter": prompt_for_boolean("Does this Upgrader reset Ore? (Should only be true if you selected ResetterUPG) ")
     }
 },
 
@@ -45,9 +33,14 @@ json_data = json.dumps(upgrader_data, indent=4)
 
 print(json_data)
 
+#Prints to Text file.
+# with open("UpgraderAsJson.txt", "w") as file:
+#     json.dump(upgrader_data, file, indent=4)
 
 
-#Examples Jsons of Upgraders:
+
+
+#Example Upgraders in Json form:
 # [
 #     {
 #     "name": "Renewal Forge",
