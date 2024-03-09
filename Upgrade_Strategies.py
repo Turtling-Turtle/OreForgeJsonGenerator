@@ -86,7 +86,7 @@ def create_bundled_UPG():
 
     if bundle["upgStrat3"]["type"] == "null":
         del bundle["upgStrat3"]["type"]
-        del bundle["upgStrat4"]
+        del bundle["upgStrat3"]
         return bundle
 
     bundle["upgStrat4"] = {

@@ -31,16 +31,7 @@ RARE = StringIntPair(color.BLUE + "RARE" + color.END, 6, '')
 UNCOMMON = StringIntPair(color.GREEN + "UNCOMMON" + color.END, 7, '')
 COMMON = StringIntPair("COMMON", 8, '')
 
-validTiers = []
-validTiers.append(PINNACLE)
-validTiers.append(SPECIAL)
-validTiers.append(EXOTIC)
-validTiers.append(PRESTIGE)
-validTiers.append(EPIC)
-validTiers.append(SUPER_RARE)
-validTiers.append(RARE)
-validTiers.append(UNCOMMON)
-validTiers.append(COMMON)
+validTiers = [PINNACLE, SPECIAL, EXOTIC, PRESTIGE, EPIC, SUPER_RARE, RARE, UNCOMMON, COMMON]
 
 
 def prompt_for_tier(item_type):
