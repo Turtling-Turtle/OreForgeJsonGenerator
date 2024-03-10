@@ -1,3 +1,4 @@
+# Line 1
 # @author Nathan Ulmen
 from Helper_Functions import prompt_for_int, prompt_for_vtm, prompt_for_float, StringIntPair
 
@@ -15,11 +16,11 @@ ResetterUPG = StringIntPair('ResetterUPG', 7,
                             " \tResets the upgrade tags of ore. Make sure to tag or as ressetter if you want it to be balanced!")
 
 # These will require oreStrategy creation to be implemented:
-ApplyEffectUPG = StringIntPair('ApplyEffect', 8, "\tApplies an effect to the ore.")
-TargetedCleanser = StringIntPair('TargetedCleanser', 9, " \tRemoves an effect from the ore.")
+# ApplyEffectUPG = StringIntPair('ApplyEffect', 8, "\tApplies an effect to the ore.")
+# TargetedCleanser = StringIntPair('TargetedCleanser', 9, " \tRemoves an effect from the ore.")
 
 # UPGS = [AddUPG, MultiplyUPG, SubtractUPG, BundledUPG, ConditionalUPG, InfluencedUPG, ResetterUPG, ApplyEffectUPG]
-UPGS = [AddUPG, MultiplyUPG, SubtractUPG, BundledUPG, ConditionalUPG]
+upgrades = [AddUPG, MultiplyUPG, SubtractUPG, BundledUPG, ConditionalUPG]
 
 
 def prompt_for_upg_type(strat):
@@ -28,27 +29,27 @@ def prompt_for_upg_type(strat):
     }
     while True:
         print()
-        for upg in UPGS:
+        for upg in upgrades:
             print(upg.associated_value, upg.name, upg.description)
         print("Enter 0 if you want dont want to add an upgrade. ")
         user_input = prompt_for_int("What type of Upgrade would you like " + strat + " to be? ")
         if user_input == 0:
             return "null"
-        for upg in UPGS:
+        for upg in upgrades:
             if user_input == upg.associated_value:
                 # Go into custom logic for each type instead of returning
                 if upg.name in [AddUPG.name, MultiplyUPG.name, SubtractUPG.name]:
-                    return create_basic_UPG(data, upg.name)
+                    return create_basic_upg(data, upg.name)
                 elif upg.name == BundledUPG.name:
-                    return create_bundled_UPG()
+                    return create_bundled_upg()
                 elif upg.name == ResetterUPG.name:
                     return ResetterUPG.name
                 elif upg.name == ConditionalUPG.name:
-                    return create_conditional_UPG()
+                    return create_conditional_upg()
         print(user_input, " is not a valid Upgrade")
 
 
-def create_basic_UPG(data, basic_upg_type):
+def create_basic_upg(data, basic_upg_type):
     data = {
         "type": basic_upg_type,
         "modifier": prompt_for_float("Enter the modifier for your " + basic_upg_type + ": "),
@@ -58,7 +59,7 @@ def create_basic_UPG(data, basic_upg_type):
     return data
 
 
-def create_bundled_UPG():
+def create_bundled_upg():
     bundle = {
         "type": "BundledUPG",
         "upgStrat1": {
@@ -134,7 +135,7 @@ def prompt_for_comparison():
         print(user_input, "is not a valid input")
 
 
-def create_conditional_UPG():
+def create_conditional_upg():
     bundle = {
         "type": "ConditionalUPG",
         "condition": prompt_for_condition(),

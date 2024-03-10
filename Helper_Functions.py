@@ -1,3 +1,4 @@
+# Line 1
 # @author Nathan Ulmen
 
 class StringIntPair:
@@ -7,7 +8,7 @@ class StringIntPair:
         self.description = description
 
 
-class color:
+class Color:
     PURPLE = '\033[95m'
     CYAN = '\033[96m'
     DARKCYAN = '\033[36m'
@@ -21,14 +22,14 @@ class color:
     END = '\033[0m'
 
 
-PINNACLE = StringIntPair(color.RED + "PINNACLE" + color.END, 0, "")
-SPECIAL = StringIntPair(color.ORANGE + "SPECIAL" + color.END, 1, '')
-EXOTIC = StringIntPair(color.YELLOW + "EXOTIC" + color.END, 2, '')
-PRESTIGE = StringIntPair(color.CYAN + "PRESTIGE" + color.END, 3, '')
-EPIC = StringIntPair(color.PURPLE + "EPIC" + color.END, 4, '')
-SUPER_RARE = StringIntPair(color.DARKCYAN + "SUPER_RARE" + color.END, 5, '')
-RARE = StringIntPair(color.BLUE + "RARE" + color.END, 6, '')
-UNCOMMON = StringIntPair(color.GREEN + "UNCOMMON" + color.END, 7, '')
+PINNACLE = StringIntPair(Color.RED + "PINNACLE" + Color.END, 0, "")
+SPECIAL = StringIntPair(Color.ORANGE + "SPECIAL" + Color.END, 1, '')
+EXOTIC = StringIntPair(Color.YELLOW + "EXOTIC" + Color.END, 2, '')
+PRESTIGE = StringIntPair(Color.CYAN + "PRESTIGE" + Color.END, 3, '')
+EPIC = StringIntPair(Color.PURPLE + "EPIC" + Color.END, 4, '')
+SUPER_RARE = StringIntPair(Color.DARKCYAN + "SUPER_RARE" + Color.END, 5, '')
+RARE = StringIntPair(Color.BLUE + "RARE" + Color.END, 6, '')
+UNCOMMON = StringIntPair(Color.GREEN + "UNCOMMON" + Color.END, 7, '')
 COMMON = StringIntPair("COMMON", 8, '')
 
 validTiers = [PINNACLE, SPECIAL, EXOTIC, PRESTIGE, EPIC, SUPER_RARE, RARE, UNCOMMON, COMMON]
@@ -50,13 +51,13 @@ def prompt_for_tier(item_type):
 
 def prompt_for_string(prompt):
     print()
-    return input(color.BOLD + prompt + color.END)
+    return input(Color.BOLD + prompt + Color.END)
 
 
 def prompt_for_float(prompt):
     print()
     while True:
-        user_input = input(color.BOLD + prompt + color.END)
+        user_input = input(Color.BOLD + prompt + Color.END)
         try:
             user_input = float(user_input)
             return user_input
@@ -67,7 +68,7 @@ def prompt_for_float(prompt):
 def prompt_for_int(prompt):
     print()
     while True:
-        user_input = input(color.BOLD + prompt + color.END)
+        user_input = input(Color.BOLD + prompt + Color.END)
         try:
             user_input = int(user_input)
             return user_input
@@ -78,7 +79,7 @@ def prompt_for_int(prompt):
 def prompt_for_boolean(prompt):
     print()
     while True:
-        user_input = input(color.BOLD + prompt + "\n Enter 't' for true, 'f' for false: " + color.END)
+        user_input = input(Color.BOLD + prompt + "\n Enter 't' for true, 'f' for false: " + Color.END)
         if user_input.lower() == 't':
             return True
         elif user_input.lower() == 'f':
@@ -90,7 +91,7 @@ def prompt_for_boolean(prompt):
 def remove_color(string):
     # Attribute is name of Property, EX: PURPLE, RED.
     # value is value associated with attribute EX: '\033[95m' is associated with purple
-    for attr, value in vars(color).items():
+    for attr, value in vars(Color).items():
         if isinstance(value, str):
             string = string.replace(value, '')
     return string
@@ -109,7 +110,7 @@ def prompt_for_vtm(upg_type):
         for value in vtm:
             print(value.associated_value, '-', value.name)
         user_input = prompt_for_int(
-            color.BOLD + "Which of those values would you like " + upg_type + " to modify? " + color.END)
+            Color.BOLD + "Which of those values would you like " + upg_type + " to modify? " + Color.END)
         for value in vtm:
             if user_input == value.associated_value:
                 return value.name

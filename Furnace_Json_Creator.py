@@ -1,13 +1,13 @@
+# Line 1
 # @author Nathan Ulmen
 
-import json
 
-from Helper_Functions import prompt_for_string, prompt_for_tier, prompt_for_float, prompt_for_int, color
+from Helper_Functions import prompt_for_string, prompt_for_tier, prompt_for_float, prompt_for_int, Color
 from Upgrade_Strategies import prompt_for_upg_type
 
 
 def create_furnace():
-    print(color.UNDERLINE + color.BOLD + "Welcome, you are creating a Furnace." + color.END)
+    print(Color.UNDERLINE + Color.BOLD + "Welcome, you are creating a Furnace." + Color.END)
 
     furnace_data = {
         "name": prompt_for_string("Enter the Furnace's name: "),
