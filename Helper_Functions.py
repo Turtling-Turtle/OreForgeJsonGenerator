@@ -32,18 +32,17 @@ RARE = StringIntPair(Color.BLUE + "RARE" + Color.END, 6, '')
 UNCOMMON = StringIntPair(Color.GREEN + "UNCOMMON" + Color.END, 7, '')
 COMMON = StringIntPair("COMMON", 8, '')
 
-validTiers = [PINNACLE, SPECIAL, EXOTIC, PRESTIGE, EPIC, SUPER_RARE, RARE, UNCOMMON, COMMON]
+valid_tiers = [PINNACLE, SPECIAL, EXOTIC, PRESTIGE, EPIC, SUPER_RARE, RARE, UNCOMMON, COMMON]
 
 
 def prompt_for_tier(item_type):
-    print()
     while True:
         print()
-        for tier in validTiers:
+        for tier in valid_tiers:
             print(tier.associated_value, '-', tier.name)
         user_input = prompt_for_int(
             "Enter the Number associated with the tier you want the " + item_type + " to posses. ")
-        for tier in validTiers:
+        for tier in valid_tiers:
             if tier.associated_value == user_input:
                 return remove_color(tier.name)  # Need to remove color before printing to Json
         print(user_input, " is not a valid input.")
@@ -79,10 +78,10 @@ def prompt_for_int(prompt):
 def prompt_for_boolean(prompt):
     print()
     while True:
-        user_input = input(Color.BOLD + prompt + "\n Enter 't' for true, 'f' for false: " + Color.END)
-        if user_input.lower() == 't':
+        user_input = input(Color.BOLD + prompt + "\n Enter 'y' for yes, 'n' for no: " + Color.END)
+        if user_input.lower() == 'y':
             return True
-        elif user_input.lower() == 'f':
+        elif user_input.lower() == 'n':
             return False
         else:
             print("Invalid input")
@@ -101,17 +100,17 @@ ORE_VALUE = StringIntPair("ORE_VALUE", 0, '')
 TEMPERATURE = StringIntPair("TEMPERATURE", 1, '')
 MULTIORE = StringIntPair("MULTIORE", 2, '')
 
-vtm = [ORE_VALUE, TEMPERATURE, MULTIORE]
+value_to_modify = [ORE_VALUE, TEMPERATURE, MULTIORE]
 
 
 def prompt_for_vtm(upg_type):
     print()
     while True:
-        for value in vtm:
+        for value in value_to_modify:
             print(value.associated_value, '-', value.name)
         user_input = prompt_for_int(
             Color.BOLD + "Which of those values would you like " + upg_type + " to modify? " + Color.END)
-        for value in vtm:
+        for value in value_to_modify:
             if user_input == value.associated_value:
                 return value.name
         print(user_input, " is not a valid input.")

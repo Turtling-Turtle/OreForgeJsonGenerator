@@ -3,11 +3,11 @@
 
 
 from Helper_Functions import prompt_for_tier, prompt_for_string, \
-    prompt_for_float, prompt_for_int
+    prompt_for_float, prompt_for_int, Color, prompt_for_boolean
 
 
 def create_dropper():
-    print("Welcome, you are creating a Dropper. Enter teh values to print the created Dropper in json.")
+    print("You are now creating a " + Color.BOLD + Color.UNDERLINE + "Dropper" + Color.END)
 
     item_type = "Dropper"
 
@@ -20,15 +20,16 @@ def create_dropper():
         #     [0, 0, 0]
         # ],
         "tier": prompt_for_tier(item_type),
+        "isShopItem": prompt_for_boolean("Is the Dropper bought with Cash? "),
         "itemValue": prompt_for_float("Enter the Dropper's value/price: "),
-        "oreName": prompt_for_string("Enter the name of the ore produced: "),
-        "oreValue": prompt_for_float("Enter the value of the ore produced: "),
-        "oreTemp": prompt_for_int("Enter an integer value that you want to represent produced ore's temperature: "),
-        "multiOre": prompt_for_int("Enter an integer for multiOre property of the ore produced: "),
-        "dropInterval": prompt_for_float("Enter the drop interval of the Dropper: "),
+        "oreName": prompt_for_string("Enter the name of the ore that the dropper will produce: "),
+        "oreValue": prompt_for_float("Enter the value of the ore that the dropper will produce: "),
+        "oreTemp": prompt_for_int("Enter an integer value that for the temperature of the ore that the dropper will produce: "),
+        "multiOre": prompt_for_int("Enter an integer value for the Multi-Ore property of the ore that the dropper will produce: "),
+        "dropInterval": prompt_for_float("Enter the drop interval(in seconds) of the dropper: "),
         # "oreStrategy": {
         #     "strategyType": null,
-        # }
+        # },
     }
 
     return dropper_data

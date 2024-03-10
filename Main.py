@@ -6,7 +6,7 @@ import json
 from Conveyor_Json_Creator import create_conveyor
 from Dropper_Json_Creator import create_dropper
 from Furnace_Json_Creator import create_furnace
-from Helper_Functions import StringIntPair, prompt_for_int, prompt_for_boolean
+from Helper_Functions import StringIntPair, prompt_for_int, prompt_for_boolean, Color
 from Upgrader_Json_Creator import create_upgrader
 
 dropper = StringIntPair("Dropper", 1, '')
@@ -24,9 +24,9 @@ items = [dropper, furnace, upgrader, conveyor]
 def main():
     data = []
     while True:
-        print("0 - Quit Item Creation")
+        print("0 - " + Color.BOLD + "Quit Item Creation" + Color.END)
         for item in items:
-            print(item.associated_value, '-', item.name)
+            print(item.associated_value, '-', Color.BOLD + item.name + Color.END)
         user_input = prompt_for_int("Which type of Item would you like to create? ")
         if user_input == 0:
             if len(data) != 0:
@@ -38,7 +38,7 @@ def main():
                         with open("ItemAsJson.txt", "a") as file:
                             json.dump(data, file, indent=4)  # Appends to file
             quit()
-        elif user_input == 1:
+        elif user_input == 1:  # I wish python supported switch statements
             created_dropper = create_dropper()
             print(json.dumps(created_dropper, indent=4))
             data.append(created_dropper)
@@ -55,7 +55,7 @@ def main():
             print(json.dumps(created_conveyor, indent=4))
             data.append(created_conveyor)
         print("Item Created")
-        if prompt_for_boolean("Would you like to quit Item Creation"):
+        if prompt_for_boolean("Would you like to quit Item Creation?"):
             if prompt_for_boolean("Would you like to print the data to a file?"):
                 if prompt_for_boolean("Would you like to overwrite the existing file?"):
                     with open("ItemAsJson.txt", "w") as file:

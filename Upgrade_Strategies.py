@@ -6,21 +6,18 @@ AddUPG = StringIntPair('AddUPG', 1, "\tWill add the modifier to the specified va
 MultiplyUPG = StringIntPair('MultiplyUPG', 2, "\tWill multiply the value to modify by the modifier.")
 SubtractUPG = StringIntPair('SubtractUPG', 3, "\tWill subtract the modifier from the specified valueToModify.")
 
-BundledUPG = StringIntPair('BundledUPG', 4,
-                           " \tSelect to bundle up different types of upgrades. EX: you want an upgrader that multiplies ore value and substracts ore Temperature.")
-ConditionalUPG = StringIntPair('ConditionalUPG', 5,
-                               "\tA conditional upgrade. Will on type of upgrade if the condidition is true and an else upgrade if condition is false.")
+BundledUPG = StringIntPair('BundledUPG', 4," \tSelect to bundle up different types of upgrades. EX: you want an upgrader that multiplies ore value and substracts ore Temperature.")
+ConditionalUPG = StringIntPair('ConditionalUPG', 5,"\tA conditional upgrade. Will on type of upgrade if the condidition is true and an else upgrade if condition is false.")
 InfluencedUPG = StringIntPair('InfluencedUPG', 6, "\tModifier is inluenced/determined by another factor.")
 
-ResetterUPG = StringIntPair('ResetterUPG', 7,
-                            " \tResets the upgrade tags of ore. Make sure to tag or as ressetter if you want it to be balanced!")
+ResetterUPG = StringIntPair('ResetterUPG', 7," \tResets the upgrade tags of ore. Make sure to tag or as ressetter if you want it to be balanced!")
 
 # These will require oreStrategy creation to be implemented:
 # ApplyEffectUPG = StringIntPair('ApplyEffect', 8, "\tApplies an effect to the ore.")
 # TargetedCleanser = StringIntPair('TargetedCleanser', 9, " \tRemoves an effect from the ore.")
 
 # UPGS = [AddUPG, MultiplyUPG, SubtractUPG, BundledUPG, ConditionalUPG, InfluencedUPG, ResetterUPG, ApplyEffectUPG]
-upgrades = [AddUPG, MultiplyUPG, SubtractUPG, BundledUPG, ConditionalUPG]
+upgrades = [AddUPG, MultiplyUPG, SubtractUPG, BundledUPG, ConditionalUPG, ResetterUPG]
 
 
 def prompt_for_upg_type(strat):
@@ -52,10 +49,9 @@ def prompt_for_upg_type(strat):
 def create_basic_upg(data, basic_upg_type):
     data = {
         "type": basic_upg_type,
-        "modifier": prompt_for_float("Enter the modifier for your " + basic_upg_type + ": "),
         "valueToModify": prompt_for_vtm(basic_upg_type),
+        "modifier": prompt_for_float("Enter the modifier for your " + basic_upg_type + ": "),
     }
-    print()
     return data
 
 
@@ -93,6 +89,11 @@ def create_bundled_upg():
     bundle["upgStrat4"] = {
         "type": prompt_for_upg_type("upgrade 3")
     }
+
+    if bundle["upgStrat4"]["type"] == "null":
+        del bundle["upgStrat4"]["type"]
+        del bundle["upgStrat4"]
+
 
     return bundle
 
