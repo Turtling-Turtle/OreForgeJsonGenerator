@@ -90,6 +90,7 @@ def prompt_for_boolean(prompt):
 def remove_color(string):
     # Attribute is name of Property, EX: PURPLE, RED.
     # value is value associated with attribute EX: '\033[95m' is associated with purple
+    vars(Color).items()
     for attr, value in vars(Color).items():
         if isinstance(value, str):
             string = string.replace(value, '')

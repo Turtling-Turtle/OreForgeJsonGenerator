@@ -10,7 +10,7 @@ BundledUPG = StringIntPair('BundledUPG', 4," \tSelect to bundle up different typ
 ConditionalUPG = StringIntPair('ConditionalUPG', 5,"\tA conditional upgrade. Will on type of upgrade if the condidition is true and an else upgrade if condition is false.")
 InfluencedUPG = StringIntPair('InfluencedUPG', 6, "\tModifier is inluenced/determined by another factor.")
 
-ResetterUPG = StringIntPair('ResetterUPG', 7," \tResets the upgrade tags of ore. Make sure to tag or as ressetter if you want it to be balanced!")
+ResetterUPG = StringIntPair('ResetterUPG', 7,"\tResets the upgrade tags of ore. Make sure to tag or as ressetter if you want it to be balanced!")
 
 # These will require oreStrategy creation to be implemented:
 # ApplyEffectUPG = StringIntPair('ApplyEffect', 8, "\tApplies an effect to the ore.")
@@ -34,7 +34,6 @@ def prompt_for_upg_type(strat):
             return "null"
         for upg in upgrades:
             if user_input == upg.associated_value:
-                # Go into custom logic for each type instead of returning
                 if upg.name in [AddUPG.name, MultiplyUPG.name, SubtractUPG.name]:
                     return create_basic_upg(data, upg.name)
                 elif upg.name == BundledUPG.name:
