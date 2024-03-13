@@ -21,9 +21,7 @@ def create_upgrader():
         "isShopItem": prompt_for_boolean("Is the Upgrader bought with Cash? "),
         "itemValue": prompt_for_float("Enter the Upgraders price/value (0 is recommended if the item isn't bought with cash): "),
         "conveyorSpeed": prompt_for_float("Enter the Upgraders conveyor speed: "),
-        "upgrade": {
-            "type": prompt_for_upg_type("the primary upgrade"),
-        },
+        "upgrade": prompt_for_upg_type("the primary upgrade"),
         "upgradeTag": {
             "name": name,
             "maxUpgrades": prompt_for_int("Enter the maximum number of times you want this upgrade to apply to an ore before the ore needs to be reset: "),

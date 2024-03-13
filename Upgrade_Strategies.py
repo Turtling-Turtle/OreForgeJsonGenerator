@@ -1,4 +1,4 @@
-# Line 1
+#!/usr/bin/env python3
 # @author Nathan Ulmen
 from Helper_Functions import prompt_for_int, prompt_for_vtm, prompt_for_float, StringIntPair
 
@@ -39,7 +39,8 @@ def prompt_for_upg_type(strat):
                 elif upg.name == BundledUPG.name:
                     return create_bundled_upg()
                 elif upg.name == ResetterUPG.name:
-                    return ResetterUPG.name
+                    bundle = {"type": ResetterUPG.name}
+                    return bundle
                 elif upg.name == ConditionalUPG.name:
                     return create_conditional_upg()
         print(user_input, " is not a valid Upgrade")
@@ -57,40 +58,40 @@ def create_basic_upg(data, basic_upg_type):
 def create_bundled_upg():
     bundle = {
         "type": "BundledUPG",
-        "upgStrat1": {
-            "type": prompt_for_upg_type("upgrade 1")
-        }
+        "upgStrat1": prompt_for_upg_type("upgrade 1")
+            # "type": prompt_for_upg_type("upgrade 1")
     }
 
-    if bundle["upgStrat1"]["type"] == "null":
-        del bundle["upgStrat1"]["type"]
+    if bundle["upgStrat1"] == "null":
+        # del bundle["upgStrat1"]["type"]
         del bundle["upgStrat1"]
         return bundle
 
-    bundle["upgStrat2"] = {
-        "type": prompt_for_upg_type("upgrade 2")
-    }
+    bundle["upgStrat2"] = prompt_for_upg_type("upgrade 2")
+        # "type": prompt_for_upg_type("upgrade 2")
+        # prompt_for_upg_type("upgrade 2")
 
-    if bundle["upgStrat2"]["type"] == "null":
-        del bundle["upgStrat2"]["type"]
+
+    if bundle["upgStrat2"]== "null":
+        # del bundle["upgStrat2"]["type"]
         del bundle["upgStrat2"]
         return bundle
 
-    bundle["upgStrat3"] = {
-        "type": prompt_for_upg_type("upgrade 3")
-    }
+    bundle["upgStrat3"] = prompt_for_upg_type("upgrade 3")
+        # "type": prompt_for_upg_type("upgrade 3")
 
-    if bundle["upgStrat3"]["type"] == "null":
-        del bundle["upgStrat3"]["type"]
+
+
+
+    if bundle["upgStrat3"]== "null":
+        # del bundle["upgStrat3"]["type"]
         del bundle["upgStrat3"]
         return bundle
 
-    bundle["upgStrat4"] = {
-        "type": prompt_for_upg_type("upgrade 3")
-    }
+    bundle["upgStrat4"] = prompt_for_upg_type("upgrade 4")
 
-    if bundle["upgStrat4"]["type"] == "null":
-        del bundle["upgStrat4"]["type"]
+    if bundle["upgStrat4"] == "null":
+        # del bundle["upgStrat4"]["type"]
         del bundle["upgStrat4"]
 
 
@@ -137,11 +138,18 @@ def prompt_for_comparison():
 
 def create_conditional_upg():
     bundle = {
-        "type": "ConditionalUPG",
+        "type": ConditionalUPG.name,
         "condition": prompt_for_condition(),
         "comparison": prompt_for_comparison(),
         "threshold": prompt_for_float("Threshold of the comparison:"),
         "ifModifier": prompt_for_upg_type("true upgrade"),
         "elseModifier": prompt_for_upg_type("false upgrade")
     }
+    return bundle
+
+def create_resetter_upg():
+    bundle = {
+        "type": ResetterUPG.name
+    }
+
     return bundle
