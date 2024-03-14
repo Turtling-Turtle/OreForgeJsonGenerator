@@ -98,7 +98,7 @@ def prompt_for_condition():
         print()
         for field in comparison_fields:
             print(field.associated_value, field.name, field.description)
-        user_input = prompt_for_int("Which condition would do you want to evaluate?")
+        user_input = prompt_for_int("Which condition would do you want to evaluate? ")
         for condition in comparison_fields:
             if user_input == condition.associated_value:
                 return condition.name
@@ -117,7 +117,7 @@ def prompt_for_comparison():
         print()
         for comparison in comparison_types:
             print(comparison.associated_value, comparison.name, comparison.description)
-        user_input = prompt_for_int("Which type of comparison would you like")
+        user_input = prompt_for_int("Which type of comparison would you like?" )
         for comparison in comparison_types:
             if user_input == comparison.associated_value:
                 return comparison.name

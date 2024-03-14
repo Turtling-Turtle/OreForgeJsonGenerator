@@ -27,9 +27,7 @@ def create_dropper():
         "oreTemp": prompt_for_int("Enter an integer value that for the temperature of the ore that the dropper will produce: "),
         "multiOre": prompt_for_int("Enter an integer value for the Multi-Ore property of the ore that the dropper will produce: "),
         "dropInterval": prompt_for_float("Enter the drop interval(in seconds) of the dropper: "),
-        # "oreStrategy": {
-        #     "strategyType": null,
-        # },
+        # "oreStrategy": create_ore_strategy(),
     }
 
     return dropper_data
