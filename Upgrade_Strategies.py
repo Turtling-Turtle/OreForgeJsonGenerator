@@ -38,7 +38,7 @@ def prompt_for_upg_type(strat):
         for upg in upgrades:
             if user_input == upg.associated_value:
                 if upg.name in [AddUPG.name, MultiplyUPG.name, SubtractUPG.name]:
-                    return create_basic_upg(data, upg.name)
+                    return create_basic_upg(upg.name)
                 elif upg.name == BundledUPG.name:
                     return create_bundled_upg()
                 elif upg.name == ResetterUPG.name:
@@ -49,7 +49,7 @@ def prompt_for_upg_type(strat):
         print(user_input, " is not a valid Upgrade")
 
 
-def create_basic_upg(data, basic_upg_type):
+def create_basic_upg(basic_upg_type):
     data = {
         "type": basic_upg_type,
         "valueToModify": prompt_for_vtm(basic_upg_type),
