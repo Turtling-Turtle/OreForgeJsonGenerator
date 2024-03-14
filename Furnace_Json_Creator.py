@@ -1,4 +1,4 @@
-# Line 1
+#!/usr/bin/env python3
 # @author Nathan Ulmen
 
 
@@ -22,9 +22,7 @@ def create_furnace():
         "itemValue": prompt_for_float("Enter the Furnace's price/value (0 is recommended if the item isn't bought with cash): "),
         "specialPointReward": prompt_for_int("Enter the Furnace's special point reward: "),
         "rewardThreshold": prompt_for_int("Enter the Furnace's special point reward threshold: "),
-        "upgrade": {
-            "type": prompt_for_upg_type("this Furnaces sell bonus"),
-        },
+        "upgrade": prompt_for_upg_type("Enter the Furnace's process effect: ")
     }
 
     return furnace_data

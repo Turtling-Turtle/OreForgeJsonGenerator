@@ -1,4 +1,4 @@
-# Line 1
+#!/usr/bin/env python3
 # @author Nathan Ulmen
 from Helper_Functions import prompt_for_string, prompt_for_tier, prompt_for_float, prompt_for_boolean, Color, \
     prompt_for_int

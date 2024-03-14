@@ -6,11 +6,14 @@ AddUPG = StringIntPair('AddUPG', 1, "\tWill add the modifier to the specified va
 MultiplyUPG = StringIntPair('MultiplyUPG', 2, "\tWill multiply the value to modify by the modifier.")
 SubtractUPG = StringIntPair('SubtractUPG', 3, "\tWill subtract the modifier from the specified valueToModify.")
 
-BundledUPG = StringIntPair('BundledUPG', 4," \tSelect to bundle up different types of upgrades. EX: you want an upgrader that multiplies ore value and substracts ore Temperature.")
-ConditionalUPG = StringIntPair('ConditionalUPG', 5,"\tA conditional upgrade. Will on type of upgrade if the condidition is true and an else upgrade if condition is false.")
+BundledUPG = StringIntPair('BundledUPG', 4,
+                           " \tSelect to bundle up different types of upgrades. EX: you want an upgrader that multiplies ore value and substracts ore Temperature.")
+ConditionalUPG = StringIntPair('ConditionalUPG', 5,
+                               "\tA conditional upgrade. Will on type of upgrade if the condidition is true and an else upgrade if condition is false.")
 InfluencedUPG = StringIntPair('InfluencedUPG', 6, "\tModifier is inluenced/determined by another factor.")
 
-ResetterUPG = StringIntPair('ResetterUPG', 7,"\tResets the upgrade tags of ore. Make sure to tag or as ressetter if you want it to be balanced!")
+ResetterUPG = StringIntPair('ResetterUPG', 7,
+                            "\tResets the upgrade tags of ore. Make sure to tag or as ressetter if you want it to be balanced!")
 
 # These will require oreStrategy creation to be implemented:
 # ApplyEffectUPG = StringIntPair('ApplyEffect', 8, "\tApplies an effect to the ore.")
@@ -59,41 +62,26 @@ def create_bundled_upg():
     bundle = {
         "type": "BundledUPG",
         "upgStrat1": prompt_for_upg_type("upgrade 1")
-            # "type": prompt_for_upg_type("upgrade 1")
     }
 
     if bundle["upgStrat1"] == "null":
-        # del bundle["upgStrat1"]["type"]
         del bundle["upgStrat1"]
         return bundle
 
     bundle["upgStrat2"] = prompt_for_upg_type("upgrade 2")
-        # "type": prompt_for_upg_type("upgrade 2")
-        # prompt_for_upg_type("upgrade 2")
-
-
-    if bundle["upgStrat2"]== "null":
-        # del bundle["upgStrat2"]["type"]
+    if bundle["upgStrat2"] == "null":
         del bundle["upgStrat2"]
         return bundle
 
     bundle["upgStrat3"] = prompt_for_upg_type("upgrade 3")
-        # "type": prompt_for_upg_type("upgrade 3")
-
-
-
-
-    if bundle["upgStrat3"]== "null":
-        # del bundle["upgStrat3"]["type"]
+    if bundle["upgStrat3"] == "null":
         del bundle["upgStrat3"]
         return bundle
 
     bundle["upgStrat4"] = prompt_for_upg_type("upgrade 4")
 
     if bundle["upgStrat4"] == "null":
-        # del bundle["upgStrat4"]["type"]
         del bundle["upgStrat4"]
-
 
     return bundle
 
@@ -146,6 +134,7 @@ def create_conditional_upg():
         "elseModifier": prompt_for_upg_type("false upgrade")
     }
     return bundle
+
 
 def create_resetter_upg():
     bundle = {
