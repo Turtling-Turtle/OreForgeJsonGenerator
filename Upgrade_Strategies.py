@@ -2,17 +2,17 @@
 # @author Nathan Ulmen
 from Helper_Functions import prompt_for_int, prompt_for_vtm, prompt_for_float, StringIntPair
 
-AddUPG = StringIntPair('AddUPG', 1, "\tWill add the modifier to the specified valueToModify.")
-MultiplyUPG = StringIntPair('MultiplyUPG', 2, "\tWill multiply the value to modify by the modifier.")
-SubtractUPG = StringIntPair('SubtractUPG', 3, "\tWill subtract the modifier from the specified valueToModify.")
+AddUPG = StringIntPair('ore.forge.Strategies.UpgradeStrategies.PrimaryUPGS.AddUPG', 1, "\tWill add the modifier to the specified valueToModify.")
+MultiplyUPG = StringIntPair('ore.forge.Strategies.UpgradeStrategies.PrimaryUPGS.MultiplyUPG', 2, "\tWill multiply the value to modify by the modifier.")
+SubtractUPG = StringIntPair('ore.forge.Strategies.UpgradeStrategies.PrimaryUPGS.SubtractUPG', 3, "\tWill subtract the modifier from the specified valueToModify.")
 
-BundledUPG = StringIntPair('BundledUPG', 4,
+BundledUPG = StringIntPair('ore.forge.Strategies.UpgradeStrategies.BundledUPG', 4,
                            " \tSelect to bundle up different types of upgrades. EX: you want an upgrader that multiplies ore value and substracts ore Temperature.")
-ConditionalUPG = StringIntPair('ConditionalUPG', 5,
+ConditionalUPG = StringIntPair('ore.forge.Strategies.UpgradeStrategies.ConditionalUPG', 5,
                                "\tA conditional upgrade. Will on type of upgrade if the condidition is true and an else upgrade if condition is false.")
-InfluencedUPG = StringIntPair('InfluencedUPG', 6, "\tModifier is inluenced/determined by another factor.")
+InfluencedUPG = StringIntPair('ore.forge.Strategies.UpgradeStrategies.InfluencedUPG', 6, "\tModifier is inluenced/determined by another factor.")
 
-ResetterUPG = StringIntPair('ResetterUPG', 7,
+ResetterUPG = StringIntPair('ore.forge.Strategies.UpgradeStrategies.ResetterUPG', 7,
                             "\tResets the upgrade tags of ore. Make sure to tag or as ressetter if you want it to be balanced!")
 
 # These will require oreStrategy creation to be implemented:
@@ -51,7 +51,7 @@ def prompt_for_upg_type(strat):
 
 def create_basic_upg(basic_upg_type):
     data = {
-        "type": basic_upg_type,
+        "upgradeType": basic_upg_type,
         "valueToModify": prompt_for_vtm(basic_upg_type),
         "modifier": prompt_for_float("Enter the modifier for your " + basic_upg_type + ": "),
     }
@@ -60,7 +60,7 @@ def create_basic_upg(basic_upg_type):
 
 def create_bundled_upg():
     bundle = {
-        "type": "BundledUPG",
+        "upgradeType": BundledUPG.name,
         "upgStrat1": prompt_for_upg_type("upgrade 1")
     }
 
@@ -126,7 +126,7 @@ def prompt_for_comparison():
 
 def create_conditional_upg():
     bundle = {
-        "type": ConditionalUPG.name,
+        "upgradeType": ConditionalUPG.name,
         "condition": prompt_for_condition(),
         "comparison": prompt_for_comparison(),
         "threshold": prompt_for_float("Threshold of the comparison:"),
@@ -138,7 +138,7 @@ def create_conditional_upg():
 
 def create_resetter_upg():
     bundle = {
-        "type": ResetterUPG.name
+        "upgradeType": ResetterUPG.name
     }
 
     return bundle
