@@ -14,6 +14,9 @@ InfluencedUPG = StringIntPair('ore.forge.Strategies.UpgradeStrategies.Influenced
 
 ResetterUPG = StringIntPair('ore.forge.Strategies.UpgradeStrategies.ResetterUPG', 7,
                             "\tResets the upgrade tags of ore. Make sure to tag or as ressetter if you want it to be balanced!")
+DestructionUPG = StringIntPair('ore.forge.Strategies.UpgradeStrategies.DestructionUPG', 8, "\tDestroys the ore.")
+ApplyEffect = StringIntPair('ore.forge.Strategies.UpgradeStrategies.ApplyEffect', 9, " \tApplies an effect to the ore.")
+
 
 # These will require oreStrategy creation to be implemented:
 # ApplyEffectUPG = StringIntPair('ApplyEffect', 8, "\tApplies an effect to the ore.")
@@ -51,7 +54,7 @@ def prompt_for_upg_type(strat):
 
 def create_basic_upg(basic_upg_type):
     data = {
-        "upgradeType": basic_upg_type,
+        "upgradeName": basic_upg_type,
         "valueToModify": prompt_for_vtm(basic_upg_type),
         "modifier": prompt_for_float("Enter the modifier for your " + basic_upg_type + ": "),
     }
@@ -60,7 +63,7 @@ def create_basic_upg(basic_upg_type):
 
 def create_bundled_upg():
     bundle = {
-        "upgradeType": BundledUPG.name,
+        "upgradeName": BundledUPG.name,
         "upgStrat1": prompt_for_upg_type("upgrade 1")
     }
 
@@ -126,7 +129,7 @@ def prompt_for_comparison():
 
 def create_conditional_upg():
     bundle = {
-        "upgradeType": ConditionalUPG.name,
+        "upgradeName": ConditionalUPG.name,
         "condition": prompt_for_condition(),
         "comparison": prompt_for_comparison(),
         "threshold": prompt_for_float("Threshold of the comparison:"),
@@ -138,7 +141,7 @@ def create_conditional_upg():
 
 def create_resetter_upg():
     bundle = {
-        "upgradeType": ResetterUPG.name
+        "upgradeName": ResetterUPG.name
     }
 
     return bundle
