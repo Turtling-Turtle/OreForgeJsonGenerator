@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # @author Nathan Ulmen
-from Helper_Functions import prompt_for_int, prompt_for_vtm, prompt_for_float, StringIntPair
+from Helper_Functions import prompt_for_int, prompt_for_vtm, prompt_for_float, StringIntPair, prompt_for_boolean
+from Ore_Strategies import prompt_for_ore_strategy
 
 basic_upgrade = ("ore.forge.Strategies.UpgradeStrategies.BasicUpgrade", "Basic Upgrade", 1,
                  "A basic upgrade modifies an ore property by either addition, subtraction, multiplication, division, or modulo")
@@ -15,12 +16,13 @@ resetter_upg = ('ore.forge.Strategies.UpgradeStrategies.ResetterUPG', "Resetter 
 apply_effect_upg = (
     'ore.forge.Strategies.UpgradeStrategies.ApplyEffectUPG', "Apply Effect", 6, "\tApplies an effect to ore.")
 
+destruction_upg = ('ore.forge.Strategies.UpgradeStrategies.DestructionUPG', "Destroy Ore", 7, "\tDestroys Ore.")
+
 # These will require oreStrategy creation to be implemented:
 # ApplyEffectUPG = StringIntPair('ApplyEffect', 8, "\tApplies an effect to the ore.")
 # TargetedCleanser = StringIntPair('TargetedCleanser', 9, " \tRemoves an effect from the ore.")
 
-# UPGS = [AddUPG, MultiplyUPG, SubtractUPG, BundledUPG, ConditionalUPG, InfluencedUPG, ResetterUPG, ApplyEffectUPG]
-upgrades = [basic_upgrade, bundled_upg, conditional_upg, influenced_upg, resetter_upg]
+upgrades = [basic_upgrade, bundled_upg, conditional_upg, influenced_upg, resetter_upg, apply_effect_upg, destruction_upg]
 
 
 def prompt_for_upg_type(strat):
@@ -48,14 +50,19 @@ def prompt_for_upg_type(strat):
                     return create_conditional_upg()
                 elif upgrade is influenced_upg:
                     return create_influenced_upg()
+                elif upgrade is apply_effect_upg:
+                    return create_apply_effect()
+                elif upgrade is destruction_upg:
+                    bundle = {"upgradeName": destruction_upg[0]}
+                    return bundle
         print(user_input, "is not a valid Upgrade")
 
 
-ADD = ("Add", 0)
-SUBTRACT = ("Subtract", 1)
-MULTIPLY = ("Multiply", 2)
-DIVIDE = ("Divide", 3)
-MODULO = ("Modulo", 4)
+ADD = ("Add", 0, "ADD")
+SUBTRACT = ("Subtract", 1, "SUBTRACT")
+MULTIPLY = ("Multiply", 2, "MULTIPLY")
+DIVIDE = ("Divide", 3, "DIVIDE")
+MODULO = ("Modulo", 4, "MODULO")
 operations = [ADD, SUBTRACT, MULTIPLY, DIVIDE, MODULO]
 
 
@@ -66,7 +73,7 @@ def prompt_for_operation(prompt_string):
         user_input = prompt_for_int(prompt_string)
         for operation in operations:
             if operation[1] == user_input:
-                return operations[0].uper()
+                return operation[2]
         else:
             print(user_input, "is not a valid input")
 
@@ -188,17 +195,18 @@ def prompt_for_VOI():
         user_input = prompt_for_int("Which value would you like to influence the modifier of this upgrade? ")
         for voi in values_of_influence:
             if user_input == voi[1]:
-                return voi[3]
+                return voi[2]
         print(user_input, "is not a valid input")
 
 def optional_prompt(prompt_string1, prompt_string2):
-    if prompt_for_float(prompt_string1):
+    if prompt_for_boolean(prompt_string1):
         return prompt_for_float(prompt_string2)
     else:
         return "null"
 
 def create_influenced_upg():
     data = {
+        "upgradeName": influenced_upg[0],
         "valueOfInfluence": prompt_for_VOI(),
         "baseUpgrade": create_basic_upg(),
         "operation": prompt_for_operation("How would you like this value of influence to influence/mutate the baseUpgrade?: "),
@@ -214,3 +222,13 @@ def create_influenced_upg():
         del data["maxModifier"]
 
     return data
+
+
+def create_apply_effect():
+    bundle = {
+        "upgradeName": apply_effect_upg[0],
+        "effectToApply": prompt_for_ore_strategy()
+
+    }
+
+    return bundle

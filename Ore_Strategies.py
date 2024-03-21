@@ -1,63 +1,92 @@
 #!/usr/bin/env python3
 # @author Nathan Ulmen
 from Helper_Functions import prompt_for_int, prompt_for_float
-from Upgrade_Strategies import StringIntPair
+import Upgrade_Strategies
 
-BundledEffect = StringIntPair("BundledEffect", 0, '')
-Inflamed = StringIntPair("Inflamed", 1, '')
-FrostBite = StringIntPair("FrostBite", 2, '')
-## Can add more strategies once I create them in the actual project. Currently, these are all I have.
+BundledEffect = ("ore.forge.Strategies.OreEffects.BundledEffect", "Bundled Effect", 0, '')
+burning = ("ore.forge.Strategies.OreEffects.Burning", "Burning", 1,
+           "Ore is lit on fire, causing its temperature to increase over time. Ore is doomed/destroyed when effect ends/runs out")
+FrostBite = ("ore.forge.Strategies.OreEffects.FrostBite", "FrostBite", 2,
+             'Ore is slowed down while under the effect and has its temperature decreased.')
+invincible = ("ore.forge.Strategies.OreEffects.Invulnerability", "Invulnerability", 3,
+              "While under the influence of this effect Ore is invincible.")
+upgrade_over_time = ("ore.forge.Strategies.OreEffects.UpgradeOverTimeEffect", "Upgrade Over Time Effect", 4,
+                     "The selected upgrade is applied to the ore on the interval that you specify.")
 
-effects = [BundledEffect, Inflamed, FrostBite]
+effects = [BundledEffect, burning, FrostBite, invincible, upgrade_over_time]
 
 
 def prompt_for_ore_strategy():
     while True:
         print()
-        for element in effects:
-            print(element.associated_value, element.name)
+        for effect in effects:
+            print(effect[2], "-", effect[1], "\t", effect[3])
         user_input = prompt_for_int("Which type of effect do you want? ")
-        for element in effects:
-            if user_input == element.associated_value:
-                if element.name == BundledEffect.name:
+        if user_input == 0:
+            return "null"
+        for effect in effects:
+            if user_input == effect[2]:
+                if effect == BundledEffect:
                     return create_bundled_effect()
-                elif element.name == Inflamed.name or FrostBite.name:
-                    return create_basic_strategy(element.name)
+                elif effect == burning or effect == FrostBite:
+                    return create_basic_strategy(effect)
+                elif effect == invincible:
+                    bundle = {"name": invincible[0]}
+                    return bundle
+                elif effect == upgrade_over_time:
+                    return create_upgrade_over_time_effect()
         print(user_input, " is an invalid input")
 
 
 def create_bundled_effect():
     bundle = {
-        "type": BundledEffect.name,
-        "oreStrat1": prompt_for_ore_strategy(),
+        "effectName": BundledEffect[0],
+        "effect1": prompt_for_ore_strategy(),
     }
 
-    if bundle["oreStrat1"] == "null":
-        del bundle["oreStrat1"]
+    if bundle["effect1"] == "null":
+        del bundle["effect1"]
         return bundle
 
-    bundle["oreStrat2"] = prompt_for_ore_strategy()
-    if bundle["oreStrat2"] == "null":
-        del bundle["upgStrat2"]
+    bundle["effect2"] = prompt_for_ore_strategy()
+    if bundle["effect2"] == "null":
+        del bundle["effect2"]
         return bundle
 
-    bundle["oreStrat3"] = prompt_for_ore_strategy()
-    if bundle["oreStrat3"] == "null":
-        del bundle["oreStrat3"]
+    bundle["effect3"] = prompt_for_ore_strategy()
+    if bundle["effect3"] == "null":
+        del bundle["effect3"]
         return bundle
 
-    bundle["oreStrat4"] = prompt_for_ore_strategy()
-    if bundle["oreStrat4"] == "null":
-        del bundle["oreStrat4"]
+    bundle["effect4"] = prompt_for_ore_strategy()
+    if bundle["effect4"] == "null":
+        del bundle["effect4"]
 
     return bundle
 
 
-def create_basic_strategy(effect_name):
+def create_basic_strategy(effect):
     data = {
-        "type": effect_name,
+        "effectName": effect[0],
+        "duration": prompt_for_float("How long would you like" + effect[1] + " to last? "),
+    }
+
+    if effect is FrostBite:
+        data["tempDecrease"] = prompt_for_float(
+            "How much would you like the ore's temperature to decrease each second? ")
+    elif effect is burning:
+        data["tempIncrease"] = prompt_for_float(
+            "How much would you like the ore's temperature to increase each second? ")
+
+    return data
+
+
+def create_upgrade_over_time_effect():
+    data = {
+        "effectName": upgrade_over_time[0],
+        "upgrade": Upgrade_Strategies.prompt_for_upg_type("Which upgrade would you like this effect to apply? "),
         "duration": prompt_for_float("How long would you like this effect to last? "),
-        "tempChange": prompt_for_float("How much would you like the temp to change every second? ")
+        "interval": prompt_for_float("Enter the interval that you want the upgrade to applied on: ")
     }
 
     return data
