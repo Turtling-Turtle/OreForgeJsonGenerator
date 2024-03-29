@@ -6,15 +6,16 @@ import json
 from Conveyor_Json_Creator import create_conveyor
 from Dropper_Json_Creator import create_dropper
 from Furnace_Json_Creator import create_furnace
-from Helper_Functions import StringIntPair, prompt_for_int, prompt_for_boolean, Color
+from Helper_Functions import prompt_for_boolean, Color, list_prompt
 from Upgrader_Json_Creator import create_upgrader
 
-dropper = StringIntPair("Dropper", 1, '')
-furnace = StringIntPair("Furnace", 2, '')
-upgrader = StringIntPair("Upgrader", 3, '')
-conveyor = StringIntPair("Conveyor", 4, '')
 
+dropper = (1, "Dropper", "Produces Ore.", '')
+furnace = (2, "Furnace", "Sells Ore.", '')
+upgrader = (3, "Upgrader", "Upgrades Ore.", '')
+conveyor = (4, "Conveyor", "Moves Ore.", '')
 items = [dropper, furnace, upgrader, conveyor]
+
 
 
 # json.dumps() is used to print to console. Prints in json form.
@@ -25,9 +26,8 @@ def main():
     data = []
     while True:
         print("0 - " + Color.BOLD + "Quit Item Creation" + Color.END)
-        for item in items:
-            print(item.associated_value, '-', Color.BOLD + item.name + Color.END)
-        user_input = prompt_for_int("Which type of Item would you like to create? ")
+        user_input = list_prompt(items, "Which type of Item would you like to create? ", True)
+
         if user_input == 0:
             if len(data) != 0:
                 if prompt_for_boolean("Would you like to print the data to a file? "):
@@ -38,19 +38,19 @@ def main():
                         with open("ItemAsJson.txt", "a") as file:
                             json.dump(data, file, indent=4)  # Appends to file
             quit()
-        elif user_input == 1:  # I wish python supported switch statements
+        elif user_input == dropper:  # I wish python supported switch statements
             created_dropper = create_dropper()
             print(json.dumps(created_dropper, indent=4))
             data.append(created_dropper)
-        elif user_input == 2:
+        elif user_input == furnace:
             created_furnace = create_furnace()
             print(json.dumps(created_furnace, indent=4))
             data.append(created_furnace)
-        elif user_input == 3:
+        elif user_input == upgrader:
             created_upgrader = create_upgrader()
             print(json.dumps(created_upgrader, indent=4))
             data.append(created_upgrader)
-        elif user_input == 4:
+        elif user_input == conveyor:
             created_conveyor = create_conveyor()
             print(json.dumps(created_conveyor, indent=4))
             data.append(created_conveyor)

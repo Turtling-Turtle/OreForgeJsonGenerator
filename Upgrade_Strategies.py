@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # @author Nathan Ulmen
-from Helper_Functions import prompt_for_int, prompt_for_vtm, prompt_for_float, StringIntPair, prompt_for_boolean, \
+from Helper_Functions import prompt_for_vtm, prompt_for_float, prompt_for_boolean, \
     list_prompt
 from Ore_Strategies import prompt_for_ore_strategy
 
@@ -48,13 +48,13 @@ def prompt_for_upg_type(strat):
             bundle = {"upgradeName": destruction_upg[0]}
             return bundle
 
-add = (1, "Add", "Adds two values.", "ADD")
-subtract = (2, "Subtract", "Subtracts two values.", "SUBTRACT")
-multiply = (3, "Multiply", "Multiplies two values.", "MULTIPLY")
-divide = (4, "Divide", "Divides two values.", "DIVIDE")
-exponent = (5, "Exponent", "Raises a value to the power of another value.", "EXPONENT")
-assignment = (6, "Assignment", "Used to 'set' a value to a specific value.", "ASSIGNMENT")
-modulo = (7, "Modulo", "Apllies the modulo operator to two values.", "MODULO")
+add = (1, "Add", "Adds the modifier to the value to modify.", "ADD")
+subtract = (2, "Subtract", "Subtracts the modifier from the value to modify.", "SUBTRACT")
+multiply = (3, "Multiply", "Multiplies the value to modify by the modifier.", "MULTIPLY")
+divide = (4, "Divide", "Divides the value to modify by the modifier.", "DIVIDE")
+exponent = (5, "Exponent", "Raises the value to modify to the power of the modifier.", "EXPONENT")
+assignment = (6, "Assignment", "Used to 'set' the value to modify to the value of the modifer.", "ASSIGNMENT")
+modulo = (7, "Modulo", "Applies the modulo operator to two values.", "MODULO")
 operations = [add, subtract, multiply, divide, exponent, assignment, modulo]
 
 def prompt_for_operation(prompt_string):
@@ -75,7 +75,7 @@ def create_basic_upg():
 
 def create_bundled_upg():
     bundle = {
-        "upgradeName": bundled_upg[0],
+        "upgradeName": bundled_upg[3],
         "upgStrat1": prompt_for_upg_type("upgrade 1")
     }
 
@@ -106,7 +106,6 @@ value = (1, "Ore Value", "The ores value.", "VALUE")
 upgrade_count = (2, "Upgrade Count", "The ores upgrade count.", "UPGRADE_COUNT")
 temperature = (3, "Temperature", "The ores temperature.", "TEMPERATURE")
 multiore = (4, "Multiore", "The ores multiore.", "MULTIORE")
-
 comparison_fields = [value, upgrade_count, temperature, multiore]
 
 
@@ -116,11 +115,11 @@ def prompt_for_condition():
         return condition[3]
 
 # [0] - AssociatedValue, [1]-Simple Name, [2] - Description, [3] - Real Name.
-greater_than = (1, "Greater Than", ">\tReturns whether or not a value is greater than another.", "GREATER_THAN")
-greater_than_equal_to = (2, ">=\tGreater Than or Equal To", "Returns whether or not a value is greater than or equal to another.", "GREATER_THAN_EQUAL_TO")
-less_than = (3, "Less Than", "<\tReturns whether or not a value is less than another.", "LESS_THAN")
-less_than_equal_to = (4, "<=\tLess Than or Equal To", "Returns whether or not a a value is less than or equal to another.", "LESS_THAN_EQUAL_TO")
-equal_to = (5, "Equal To", "==\tReturns if a value is equal to another", "EQUAL_TO")
+greater_than = (1, "Greater Than", "Returns whether or not the specified value is greater than the threshold.", "GREATER_THAN")
+greater_than_equal_to = (2, "Greater Than or Equal To", "Returns whether or not the specified value is greater than or equal to the threshold.", "GREATER_THAN_EQUAL_TO")
+less_than = (3, "Less Than", "Returns whether or not a the specified value is less than the threshold.", "LESS_THAN")
+less_than_equal_to = (4, "Less Than or Equal To", "Returns whether or not the specified value is less than or equal to the threshold.", "LESS_THAN_EQUAL_TO")
+equal_to = (5, "Equal To", "Returns if a the specified value is equal to the threshold.", "EQUAL_TO")
 comparison_types = [greater_than, greater_than_equal_to, less_than, less_than_equal_to, equal_to]
 
 def prompt_for_comparison():
@@ -130,7 +129,7 @@ def prompt_for_comparison():
 
 def create_conditional_upg():
     bundle = {
-        "upgradeName": conditional_upg[0],
+        "upgradeName": conditional_upg[3],
         "condition": prompt_for_condition(),
         "comparison": prompt_for_comparison(),
         "threshold": prompt_for_float("Threshold of the comparison:"),
@@ -142,7 +141,7 @@ def create_conditional_upg():
 
 def create_resetter_upg():
     bundle = {
-        "upgradeName": resetter_upg[0]
+        "upgradeName": resetter_upg[3]
     }
 
     return bundle
@@ -162,20 +161,21 @@ def prompt_for_VOI():
         value_of_influence = list_prompt(values_of_influence, "Which of those values would you like to influence this upgrades modifier?", False)
         return value_of_influence[3]
 
-def optional_prompt(prompt_string1, prompt_string2):
+def optional_float_prompt(prompt_string1, prompt_string2):
     if prompt_for_boolean(prompt_string1):
         return prompt_for_float(prompt_string2)
     else:
         return "null"
 
+# TODO: Make this prompt easier to follow/understand.
 def create_influenced_upg():
     data = {
-        "upgradeName": influenced_upg[0],
+        "upgradeName": influenced_upg[3],
         "valueOfInfluence": prompt_for_VOI(),
         "baseUpgrade": create_basic_upg(),
         "operation": prompt_for_operation("How would you like this value of influence to influence/mutate the baseUpgrade?: "),
-        "minModifier": optional_prompt("Would you like to set a min modifier? ", "Enter the minimum for the modifier: "), # Should make custom prompt for this and max modifier.
-        "maxModifier": optional_prompt("Would you like to set a max modifier? ", "Enter the maximum for the modifier: "),
+        "minModifier": optional_float_prompt("Would you like to set a min modifier? ", "Enter the minimum for the modifier: "),
+        "maxModifier": optional_float_prompt("Would you like to set a max modifier? ", "Enter the maximum for the modifier: "),
         "scalar": prompt_for_float("Enter the scalar that is applied (Enter 1 if you dont want a scalar): ")
     }
 
@@ -190,9 +190,8 @@ def create_influenced_upg():
 
 def create_apply_effect():
     bundle = {
-        "upgradeName": apply_effect_upg[0],
+        "upgradeName": apply_effect_upg[3],
         "effectToApply": prompt_for_ore_strategy()
-
     }
 
     return bundle
