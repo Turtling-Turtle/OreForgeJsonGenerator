@@ -14,11 +14,11 @@ def create_dropper():
     dropper_data = {
         "name": prompt_for_string("Enter the name of the Dropper: "),
         "description": prompt_for_string("Enter the Dropper's description: "),
-        # "blockLayout": [
-        #     [0, 3, 0],
-        #     [0, 0, 0],
-        #     [0, 0, 0]
-        # ],
+        "blockLayout": [
+            [0, 3, 0],
+            [0, 0, 0],
+            [0, 0, 0]
+        ],
         "tier": prompt_for_tier(item_type),
         "isShopItem": prompt_for_boolean("Is the Dropper bought with Cash? "),
         "itemValue": prompt_for_float("Enter the Dropper's value/price: "),

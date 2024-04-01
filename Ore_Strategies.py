@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # @author Nathan Ulmen
-from Helper_Functions import prompt_for_int, prompt_for_float, list_prompt
+from Helper_Functions import prompt_for_float, list_prompt
 import Upgrade_Strategies
 
 # BundledEffect = ("ore.forge.Strategies.OreEffects.BundledEffect", "Bundled Effect", 0, '')

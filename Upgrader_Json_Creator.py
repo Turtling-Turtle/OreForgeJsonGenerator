@@ -13,9 +13,8 @@ def create_upgrader():
         "name": name,
         "description": prompt_for_string("Enter the Upgraders description: "),
         "blockLayout": [
-            [0, 1, 1, 0],
-            [0, 2, 2, 0],
-            [0, 1, 1, 0]
+            [2, 2],
+            [1, 1]
         ],
         "tier": prompt_for_tier("Upgrader"),
         "isShopItem": prompt_for_boolean("Is the Upgrader bought with Cash? "),

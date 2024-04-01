@@ -12,10 +12,10 @@ def create_conveyor():
     conveyor_data = {
         "name": prompt_for_string("Enter the name of the Conveyor: "),
         "description": prompt_for_string("Enter the Conveyor's description: "),
-        # "blockLayout": [
-        #     [1,1],
-        #     [1,1]
-        # ],
+        "blockLayout": [
+            [1,1],
+            [1,1]
+        ],
         "tier": prompt_for_tier(item_type),
         "isShopItem": prompt_for_boolean("Is the Conveyor bought with Cash? "),
         "itemValue": prompt_for_float("Enter the Conveyor's price/value (0 is recommended if the item isn't bought "

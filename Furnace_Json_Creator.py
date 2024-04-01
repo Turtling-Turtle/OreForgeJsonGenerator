@@ -13,10 +13,10 @@ def create_furnace():
     furnace_data = {
         "name": prompt_for_string("Enter the Furnace's name: "),
         "description": prompt_for_string("Enter the Furnace's description: "),
-        # "blockLayout": [
-        #   [4, 4],
-        #   [4, 4]
-        # ],
+        "blockLayout": [
+          [4, 4],
+          [4, 4]
+        ],
         "tier": prompt_for_tier("Furnace"),
         "isShopItem": prompt_for_boolean("Is the Furnace bought with Cash? "),
         "itemValue": prompt_for_float("Enter the Furnace's price/value (0 is recommended if the item isn't bought with cash): "),
