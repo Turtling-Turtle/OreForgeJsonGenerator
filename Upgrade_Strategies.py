@@ -38,9 +38,9 @@ upgrades = [basic_upgrade, bundled_upg, conditional_upg, influenced_upg, resette
 
 # [0] - AssociatedValue, [1]-Simple Name, [2] - Description, [3] - Real Name.
 
-def prompt_for_upg_type(strat):
+def prompt_for_upg_type(strategy):
     while True:
-        upgrade = list_prompt(upgrades, "Which type of Upgrade would you like " + strat + " to be?", True)
+        upgrade = list_prompt(upgrades, "Which type of Upgrade would you like " + strategy + " to be?", True)
         if upgrade == 0:
             return "null"
         if upgrade is basic_upgrade:
