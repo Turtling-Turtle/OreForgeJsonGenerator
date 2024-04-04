@@ -82,12 +82,9 @@ def prompt_for_boolean(prompt):
     print()
     while True:
         user_input = input(Color.BOLD + prompt + "\n Enter 'y' for yes, 'n' for no: " + Color.END)
-        if user_input.lower() == 'y':
-            return True
-        elif user_input.lower() == 'n':
-            return False
-        else:
-            print("Invalid input")
+        if user_input.lower() in ('y', 'n'):
+            return user_input.lower() == 'y'
+        print("Invalid input")
 
 
 ore_value = (1, "Ore Value", "The ores value.", "ORE_VALUE")
