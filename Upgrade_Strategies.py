@@ -12,9 +12,7 @@ bundled_upg = (2, "Bundled Upgrade",
                "Select to bundle up different types of upgrades. EX: you want an upgrader that multiplies ore value and substracts ore Temperature.",
                "ore.forge.Strategies.UpgradeStrategies.BundledUPG")
 
-conditional_upg = (3, "Conditional Upgrade",
-                   "A conditional upgrade. Will on type of upgrade if the condition is true and an else upgrade if condition is false.",
-                   "ore.forge.Strategies.UpgradeStrategies.ConditionalUPG")
+conditional_upg = (3, "Conditional Upgrade", "A conditional upgrade. Will on type of upgrade if the condition is true and an else upgrade if condition is false.", "ore.forge.Strategies.UpgradeStrategies.ConditionalUPG")
 
 influenced_upg = (4, "Influenced Upgrade", "Modifier is influenced/determined by another factor.",
                   "ore.forge.Strategies.UpgradeStrategies.InfluencedUPG")
@@ -38,10 +36,10 @@ upgrades = [basic_upgrade, bundled_upg, conditional_upg, influenced_upg, resette
 
 # [0] - AssociatedValue, [1]-Simple Name, [2] - Description, [3] - Real Name.
 
-def prompt_for_upg_type(strat):
+def prompt_for_upg_type(strat, can_return_zero):
     while True:
-        upgrade = list_prompt(upgrades, "Which type of Upgrade would you like " + strat + " to be?", True)
-        if upgrade == 0:
+        upgrade = list_prompt(upgrades, "Which type of Upgrade would you like " + strat + " to be?", can_return_zero)
+        if upgrade == 0 and can_return_zero:
             return "null"
         if upgrade is basic_upgrade:
             return create_basic_upg()
@@ -79,7 +77,7 @@ def prompt_for_operation(prompt_string):
 
 def create_basic_upg():
     data = {
-        "upgradeName": basic_upgrade[0],
+        "upgradeName": basic_upgrade[3],
         "valueToModify": prompt_for_vtm(basic_upgrade[1]),
         "operation": prompt_for_operation("Which operation would you like this upgrade to utilize? "),
         "modifier": prompt_for_float("Enter the modifier for your " + basic_upgrade[1] + ": ")
@@ -87,32 +85,21 @@ def create_basic_upg():
     return data
 
 
+# TODO: Update so that it generates until stopped, its no longer limited to just 4 values.
 def create_bundled_upg():
+    count = 1
     bundle = {
         "upgradeName": bundled_upg[3],
-        "upgStrat1": prompt_for_upg_type("upgrade 1")
+        "upgStrat" + str(count): prompt_for_upg_type("upgrade 1", False)
     }
 
-    if bundle["upgStrat1"] == "null":
-        del bundle["upgStrat1"]
-        return bundle
-
-    bundle["upgStrat2"] = prompt_for_upg_type("upgrade 2")
-    if bundle["upgStrat2"] == "null":
-        del bundle["upgStrat2"]
-        return bundle
-
-    bundle["upgStrat3"] = prompt_for_upg_type("upgrade 3")
-    if bundle["upgStrat3"] == "null":
-        del bundle["upgStrat3"]
-        return bundle
-
-    bundle["upgStrat4"] = prompt_for_upg_type("upgrade 4")
-
-    if bundle["upgStrat4"] == "null":
-        del bundle["upgStrat4"]
-
-    return bundle
+    while True:
+        count += 1
+        result = prompt_for_upg_type("What would you like upgrade" + str(count) + " to do? ", True)
+        if result == "null":
+            return bundle
+        else:
+            bundle["upgStrat"+str(count)] = result
 
 
 value = (1, "Ore Value", "The ores value.", "VALUE")
@@ -153,8 +140,8 @@ def create_conditional_upg():
         "condition": prompt_for_condition(),
         "comparison": prompt_for_comparison(),
         "threshold": prompt_for_float("Threshold of the comparison:"),
-        "ifModifier": prompt_for_upg_type("true upgrade"),
-        "elseModifier": prompt_for_upg_type("false upgrade")
+        "ifModifier": prompt_for_upg_type("true upgrade", False),
+        "elseModifier": prompt_for_upg_type("false upgrade", True)
     }
     return bundle
 
@@ -219,7 +206,7 @@ def create_influenced_upg():
 def create_apply_effect():
     bundle = {
         "upgradeName": apply_effect_upg[3],
-        "effectToApply": prompt_for_ore_strategy()
+        "effectToApply": prompt_for_ore_strategy("Which ore effect would you like this upgrade to apply? ", False)
     }
 
     return bundle

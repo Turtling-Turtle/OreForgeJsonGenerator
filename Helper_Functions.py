@@ -21,6 +21,8 @@ def list_prompt(values_to_prompt_from, prompt, can_return_zero):
         for element in values_to_prompt_from:
             # [0] - AssociatedValue, [1]-Simple Name, [2] - Description, [3] - Real Name.
             print(element[0], "-", element[1], "-", element[2])
+        if can_return_zero:
+            print("Enter 0 if dont want any more/are finished selecting")
         user_input = prompt_for_int(prompt)
         if can_return_zero and user_input == 0:
             return user_input

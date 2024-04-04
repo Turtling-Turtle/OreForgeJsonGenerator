@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # @author Nathan Ulmen
-from Helper_Functions import prompt_for_float, list_prompt
+from Helper_Functions import prompt_for_float, list_prompt, prompt_for_int
 import Upgrade_Strategies
 
 # BundledEffect = ("ore.forge.Strategies.OreEffects.BundledEffect", "Bundled Effect", 0, '')
@@ -26,66 +26,34 @@ upgrade_over_time = (5, "Upgrade Over Time", "Applies an upgrade to the ore on a
 effects = [bundled_effect, burning, frost_bite, invincible, upgrade_over_time]
 
 
-def prompt_for_ore_strategy():
+def prompt_for_ore_strategy(prompt, can_return_zero):
     while True:
-        effect = list_prompt(effects, "Which effect do you want to be applied? ", True)
-        if effect == 0:
+        effect = list_prompt(effects, prompt, can_return_zero)
+        if effect == 0 and can_return_zero:
             return "null"
         if effect == bundled_effect:
             return create_bundled_effect()
         elif effect == burning or effect == frost_bite:
             return create_basic_strategy(effect)
         elif effect == invincible:
-            bundle = {"name": invincible[3]}
-            return bundle
+            return create_invulnerability_effect()
         elif effect == upgrade_over_time:
             return create_upgrade_over_time_effect()
-    # while True:
-    #     print()
-    #     for effect in effects:
-    #         print(effect[2], "-", effect[1], "\t", effect[3])
-    #     user_input = prompt_for_int("Which type of effect do you want? ")
-    #     if user_input == 0:
-    #         return "null"
-    #     for effect in effects:
-    #         if user_input == effect[2]:
-    #             if effect == BundledEffect:
-    #                 return create_bundled_effect()
-    #             elif effect == burning or effect == FrostBite:
-    #                 return create_basic_strategy(effect)
-    #             elif effect == invincible:
-    #                 bundle = {"name": invincible[0]}
-    #                 return bundle
-    #             elif effect == upgrade_over_time:
-    #                 return create_upgrade_over_time_effect()
-    #     print(user_input, " is an invalid input")
 
-
+# TODO: Update so that its not limited to only 4 values.
 def create_bundled_effect():
+    count = 1
     bundle = {
         "effectName": bundled_effect[3],
-        "effect1": prompt_for_ore_strategy(),
+        "effect" + str(count): prompt_for_ore_strategy("What would you like + effect " + str(count) + " to be? ", False),
     }
-
-    if bundle["effect1"] == "null":
-        del bundle["effect1"]
-        return bundle
-
-    bundle["effect2"] = prompt_for_ore_strategy()
-    if bundle["effect2"] == "null":
-        del bundle["effect2"]
-        return bundle
-
-    bundle["effect3"] = prompt_for_ore_strategy()
-    if bundle["effect3"] == "null":
-        del bundle["effect3"]
-        return bundle
-
-    bundle["effect4"] = prompt_for_ore_strategy()
-    if bundle["effect4"] == "null":
-        del bundle["effect4"]
-
-    return bundle
+    while True:
+        count +=1
+        result = prompt_for_ore_strategy("What would you like effect" + str(count) + "to be? ", True)
+        if result == "null":
+            return bundle
+        else:
+            bundle["effect" + str(count)] = result
 
 
 def create_basic_strategy(effect):
@@ -107,9 +75,18 @@ def create_basic_strategy(effect):
 def create_upgrade_over_time_effect():
     data = {
         "effectName": upgrade_over_time[3],
-        "upgrade": Upgrade_Strategies.prompt_for_upg_type("Which upgrade would you like this effect to apply? "),
+        "upgrade": Upgrade_Strategies.prompt_for_upg_type("Which upgrade would you like this effect to apply? ", False),
         "duration": prompt_for_float("How long would you like this effect to last? "),
         "interval": prompt_for_float("Enter the interval that you want the upgrade to applied on: ")
+    }
+
+    return data
+
+def create_invulnerability_effect():
+    data = {
+        "effectName": invincible[3],
+        "charges": prompt_for_int("How many charges do you want this effect to have? "),
+        "duration": prompt_for_float("How long would you like this invulnerability effect to last? ")
     }
 
     return data
