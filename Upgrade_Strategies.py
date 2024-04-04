@@ -10,21 +10,21 @@ basic_upgrade = (1, "Basic Upgrade",
 
 bundled_upg = (2, "Bundled Upgrade",
                "Select to bundle up different types of upgrades. EX: you want an upgrader that multiplies ore value and substracts ore Temperature.",
-               "ore.forge.Strategies.UpgradeStrategies.BundledUPG")
+               "ore.forge.Strategies.UpgradeStrategies.BundledUpgrade")
 
-conditional_upg = (3, "Conditional Upgrade", "A conditional upgrade. Will on type of upgrade if the condition is true and an else upgrade if condition is false.", "ore.forge.Strategies.UpgradeStrategies.ConditionalUPG")
+conditional_upg = (3, "Conditional Upgrade", "A conditional upgrade. Will on type of upgrade if the condition is true and an else upgrade if condition is false.", "ore.forge.Strategies.UpgradeStrategies.ConditionalUpgrade")
 
 influenced_upg = (4, "Influenced Upgrade", "Modifier is influenced/determined by another factor.",
-                  "ore.forge.Strategies.UpgradeStrategies.InfluencedUPG")
+                  "ore.forge.Strategies.UpgradeStrategies.InfluencedUpgrade")
 
 resetter_upg = (
 5, "Resetter Upgrade", "Resets the upgrade tags of ore. Make sure to tag or as resetter if you want it to be balanced!",
-"ore.forge.Strategies.UpgradeStrategies.ResetterUPG")
+"ore.forge.Strategies.UpgradeStrategies.ResetterUpgrade")
 
 apply_effect_upg = (
-6, "Apply Effect", "Applies an effect to ore.", "ore.forge.Strategies.UpgradeStrategies.ApplyEffectUPG")
+6, "Apply Effect", "Applies an effect to ore.", "ore.forge.Strategies.UpgradeStrategies.ApplyEffectUpgrade")
 
-destruction_upg = (7, "Destroy Ore", "Destroys Ore.", "ore.forge.Strategies.UpgradeStrategies.DestructionUPG")
+destruction_upg = (7, "Destroy Ore", "Destroys Ore.", "ore.forge.Strategies.UpgradeStrategies.DestructionUpgrade")
 
 # These will require oreStrategy creation to be implemented:
 # ApplyEffectUPG = StringIntPair('ApplyEffect', 8, "\tApplies an effect to the ore.")

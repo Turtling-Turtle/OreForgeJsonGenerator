@@ -13,7 +13,7 @@ import Upgrade_Strategies
 # upgrade_over_time = ("ore.forge.Strategies.OreEffects.UpgradeOverTimeEffect", "Upgrade Over Time Effect", 4,
 #                      "The selected upgrade is applied to the ore on the interval that you specify.")
 
-bundled_effect = (1, "Bundled Effect", "Used to bundle up multiple different effects into one.", "ore.forge.Strategies.OreEffects.BundledEffect")
+bundled_effect = (1, "Bundled Effect", "Used to bundle up multiple different effects into one.", "ore.forge.Strategies.OreEffects.BundledOreEffect")
 
 burning = (2, "Burning", "Ore is lit on fire, causing its temperature to increase over time. Ore is doomed/destroyed when this effect expires.", "ore.forge.Strategies.OreEffects.Burning")
 
@@ -21,7 +21,7 @@ frost_bite = (3, "Frost Bite", "Ore is frozen, causing it to be slowed down and 
 
 invincible = (4, "Invulnerability", "While under the influence of this effect the ore, the ore is saved from a doomed state as long as there are charges left", "ore.forge.Strategies.OreEffects.Invulnerability")
 
-upgrade_over_time = (5, "Upgrade Over Time", "Applies an upgrade to the ore on an interval.", "ore.forge.Strategies.OreEffects.UpgradeOverTimeEffect")
+upgrade_over_time = (5, "Upgrade Over Time", "Applies an upgrade to the ore on an interval.", "ore.forge.Strategies.OreEffects.UpgradeOreEffect")
 
 effects = [bundled_effect, burning, frost_bite, invincible, upgrade_over_time]
 
