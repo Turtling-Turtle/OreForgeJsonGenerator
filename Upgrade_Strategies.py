@@ -46,7 +46,7 @@ def prompt_for_upg_type(strat, can_return_zero):
         elif upgrade is bundled_upg:
             return create_bundled_upg()
         elif upgrade is resetter_upg:
-            bundle = {"upgradeName": resetter_upg[0]}
+            bundle = {"upgradeName": resetter_upg[3]}
             return bundle
         elif upgrade is conditional_upg:
             return create_conditional_upg()
@@ -55,7 +55,7 @@ def prompt_for_upg_type(strat, can_return_zero):
         elif upgrade is apply_effect_upg:
             return create_apply_effect()
         elif upgrade is destruction_upg:
-            bundle = {"upgradeName": destruction_upg[0]}
+            bundle = {"upgradeName": destruction_upg[3]}
             return bundle
 
 
