@@ -3,11 +3,8 @@
 
 import json
 
-from Conveyor_Json_Creator import create_conveyor
-from Dropper_Json_Creator import create_dropper
-from Furnace_Json_Creator import create_furnace
 from Helper_Functions import prompt_for_boolean, Color, list_prompt
-from Upgrader_Json_Creator import create_upgrader
+from Item_Constructors import create_dropper, create_furnace, create_upgrader, create_conveyor
 
 dropper = (1, "Dropper", "Droppers are responsible for producing/dropping ore.", '')
 furnace = (2, "Furnace", "Furnaces sell ore, typically with an added bonus.", '')

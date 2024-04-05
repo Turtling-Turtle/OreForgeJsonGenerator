@@ -85,7 +85,6 @@ def create_basic_upg():
     return data
 
 
-# TODO: Update so that it generates until stopped, its no longer limited to just 4 values.
 def create_bundled_upg():
     count = 1
     bundle = {
