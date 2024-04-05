@@ -7,12 +7,12 @@ from Upgrade_Strategies import prompt_for_upg_type
 
 def common_attributes(item_type):
     common_data = {
-        "name": prompt_for_string("Enter the " + item_type + "'s name"),
-        "description": prompt_for_string("Enter the description for the " + item_type),
+        "name": prompt_for_string("Enter the " + item_type + "'s name: "),
+        "description": prompt_for_string("Enter the" + item_type + "'s description: "),
         "tier": prompt_for_tier(item_type),
-        "isShopItem": prompt_for_boolean("Is this " + item_type + "bought with cash? "),
+        "isShopItem": prompt_for_boolean("Is this " + item_type + " bought with cash? "),
         "itemValue": prompt_for_float(
-            "Enter the " + item_type + "'s value/price ( 0 is recommended if the item isnt bought with cash) ")
+            "Enter the " + item_type + "'s value/price ( 0 is recommended if the item isn't bought with cash) ")
     }
 
     return common_data
@@ -80,8 +80,6 @@ def create_dropper():
 
 def create_conveyor():
     print("You are now creating a " + Color.BOLD + Color.UNDERLINE + "Conveyor" + Color.END)
-
-    item_type = "Conveyor"
     conveyor_data = common_attributes("Conveyor")
     conveyor_data.update({
         "blockLayout": [

@@ -47,7 +47,7 @@ valid_tiers = [pinnacle, special, exotic, prestige, epic, super_rare, rare, unco
 
 def prompt_for_tier(item_type):
     while True:
-        tier = list_prompt(valid_tiers, "Which tier would you like your " + item_type + " to have?", False)
+        tier = list_prompt(valid_tiers, "Which tier would you like your " + item_type + " to have? ", False)
         return tier[3]
 
 

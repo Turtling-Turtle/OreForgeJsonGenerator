@@ -21,8 +21,8 @@ burning = (2, "Burning",
            "ore.forge.Strategies.OreEffects.Burning")
 
 frost_bite = (3, "Frost Bite", "Ore is frozen, causing it to be slowed down and its temperature decreased.",
-              "ore.forge.Strategies.OreEffects.FrostBite") \
- \
+              "ore.forge.Strategies.OreEffects.FrostBite")
+
 invincible = (4, "Invulnerability",
               "While under the influence of this effect the ore, the ore is saved from a doomed state as long as there are charges left",
               "ore.forge.Strategies.OreEffects.Invulnerability")
