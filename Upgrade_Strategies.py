@@ -89,7 +89,7 @@ def create_bundled_upg():
     count = 1
     bundle = {
         "upgradeName": bundled_upg[3],
-        "upgStrat" + str(count): prompt_for_upg_type("upgrade 1", False)
+        "upgStrat" + str(count): prompt_for_upg_type("upgrade" + str(count), False)
     }
 
     while True:
