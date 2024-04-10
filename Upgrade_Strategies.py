@@ -101,7 +101,7 @@ def create_bundled_upg():
             bundle["upgStrat"+str(count)] = result
 
 
-value = (1, "Ore Value", "The ores value.", "VALUE")
+value = (1, "Ore Value", "The ores value.", "ORE_VALUE")
 upgrade_count = (2, "Upgrade Count", "The ores upgrade count.", "UPGRADE_COUNT")
 temperature = (3, "Temperature", "The ores temperature.", "TEMPERATURE")
 multiore = (4, "Multiore", "The ores multiore.", "MULTIORE")
@@ -182,10 +182,11 @@ def optional_float_prompt(prompt_string1, prompt_string2):
 def create_influenced_upg():
     data = {
         "upgradeName": influenced_upg[3],
-        "valueOfInfluence": prompt_for_voi(),
-        "baseUpgrade": create_basic_upg(),
-        "operation": prompt_for_operation(
-            "How would you like this value of influence to influence/mutate the baseUpgrade?: "),
+        "upgradeFunction": prompt_for_function(),
+        # "valueOfInfluence": prompt_for_voi(),
+        # "baseUpgrade": create_basic_upg(),
+        # "operation": prompt_for_operation(
+        #     "How would you like this value of influence to influence/mutate the baseUpgrade?: "),
         "minModifier": optional_float_prompt("Would you like to set a min modifier? ",
                                              "Enter the minimum for the modifier: "),
         "maxModifier": optional_float_prompt("Would you like to set a max modifier? ",
@@ -201,6 +202,12 @@ def create_influenced_upg():
 
     return data
 
+def prompt_for_function():
+    #1st: We give them all the info they need to know for creating an upgradeFunction
+    #2nd: prompt them for their String.
+    #3rd: verify that the input is actually a valid upgradeFunction by "compiling" it. (aka just do what the java algorithm does and see if it works)
+
+    return 1
 
 def create_apply_effect():
     bundle = {

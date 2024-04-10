@@ -98,3 +98,6 @@ def prompt_for_vtm(upg_type):
     while True:
         vtm = list_prompt(value_to_modify, "Which value would you like " + upg_type + " to modify? ", False)
         return vtm[3]
+
+def create_function():
+    prompt_for_string("What do you want to do?")
