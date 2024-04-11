@@ -182,11 +182,8 @@ def optional_float_prompt(prompt_string1, prompt_string2):
 def create_influenced_upg():
     data = {
         "upgradeName": influenced_upg[3],
-        "upgradeFunction": prompt_for_function(),
-        # "valueOfInfluence": prompt_for_voi(),
+        "upgradeFunction": prompt_for_upgrade_function(),
         # "baseUpgrade": create_basic_upg(),
-        # "operation": prompt_for_operation(
-        #     "How would you like this value of influence to influence/mutate the baseUpgrade?: "),
         "minModifier": optional_float_prompt("Would you like to set a min modifier? ",
                                              "Enter the minimum for the modifier: "),
         "maxModifier": optional_float_prompt("Would you like to set a max modifier? ",
@@ -202,7 +199,7 @@ def create_influenced_upg():
 
     return data
 
-def prompt_for_function():
+def prompt_for_upgrade_function():
     #1st: We give them all the info they need to know for creating an upgradeFunction
     #2nd: prompt them for their String.
     #3rd: verify that the input is actually a valid upgradeFunction by "compiling" it. (aka just do what the java algorithm does and see if it works)
