@@ -3,6 +3,7 @@
 from Helper_Functions import prompt_for_vtm, prompt_for_float, prompt_for_boolean, \
     list_prompt
 from Ore_Strategies import prompt_for_ore_strategy
+import queue, re
 
 basic_upgrade = (1, "Basic Upgrade",
                  "A basic upgrade modifies an ore property by either addition, subtraction, multiplication, division, or modulo",
@@ -184,6 +185,9 @@ def create_influenced_upg():
         "upgradeName": influenced_upg[3],
         "upgradeFunction": prompt_for_upgrade_function(),
         # "baseUpgrade": create_basic_upg(),
+        # "valueToModify": prompt_for_vtm(),
+        # "":
+        # ""
         "minModifier": optional_float_prompt("Would you like to set a min modifier? ",
                                              "Enter the minimum for the modifier: "),
         "maxModifier": optional_float_prompt("Would you like to set a max modifier? ",
@@ -203,6 +207,30 @@ def prompt_for_upgrade_function():
     #1st: We give them all the info they need to know for creating an upgradeFunction
     #2nd: prompt them for their String.
     #3rd: verify that the input is actually a valid upgradeFunction by "compiling" it. (aka just do what the java algorithm does and see if it works)
+    print("((ORE_VALUE * 2) + 20)")
+    user_input = input("Please enter your function, it should look similar to the function above: ")
+    user_input = re.sub("\\s", "", user_input) # Trim white space.
+    operand_stack = queue.LifoQueue
+
+    operator_stack = queue.LifoQueue()
+    match = re.match("([a-zA-Z_]+|\\(|\\)|\\d+(\\.\\d+)?|\\+|-|\\*|/|=|%|\\^)", user_input)
+    for token in match:
+        if token is "(":
+            print("")
+        elif token is ")":
+            right_operand = operand_stack.get
+            left_operand = operator_stack.get
+            operator = operator_stack.get()
+            function = (right_operand, operator, left_operand)
+        operand_stack.put(function)
+
+    return operand_stack.get
+
+
+
+
+
+
 
     return 1
 
