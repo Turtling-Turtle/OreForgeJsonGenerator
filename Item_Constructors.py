@@ -1,3 +1,5 @@
+import random
+
 from Helper_Functions import Color, prompt_for_string, prompt_for_tier, prompt_for_boolean, prompt_for_float, \
     prompt_for_int
 from Upgrade_Strategies import prompt_for_upg_type
@@ -8,6 +10,7 @@ from Upgrade_Strategies import prompt_for_upg_type
 def common_attributes(item_type):
     common_data = {
         "name": prompt_for_string("Enter the " + item_type + "'s name: "),
+        "id": generate_item_id(),
         "description": prompt_for_string("Enter the" + item_type + "'s description: "),
         "tier": prompt_for_tier(item_type),
         "isShopItem": prompt_for_boolean("Is this " + item_type + " bought with cash? "),
@@ -16,6 +19,18 @@ def common_attributes(item_type):
     }
 
     return common_data
+
+
+def generate_item_id():
+    chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+    nums = "0123456789"
+    item_id = ""
+    for i in range(3):
+        item_id += nums[random.randint(0, len(nums) - 1)]
+    item_id += "-"
+    for i in range(8):
+        item_id += chars[random.randint(0, len(chars) - 1)]
+    return item_id
 
 
 def create_furnace():
@@ -46,6 +61,7 @@ def create_upgrader():
         "upgrade": prompt_for_upg_type("the primary upgrade ", False),
         "upgradeTag": {
             "name": upgrader_data.get("name"),
+            "id": upgrader_data.get("id"),
             "maxUpgrades": prompt_for_int(
                 "Enter the maximum number of times you want this upgrade to apply to an ore before the ore needs to be reset: "),
             "isResetter": prompt_for_boolean(

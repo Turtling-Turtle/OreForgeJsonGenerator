@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 # @author Nathan Ulmen
+import queue
+
 from Helper_Functions import prompt_for_vtm, prompt_for_float, prompt_for_boolean, \
-    list_prompt
+    list_prompt, is_numeric
 from Ore_Strategies import prompt_for_ore_strategy
-import queue, re
+from queue import LifoQueue
+import re
 
 basic_upgrade = (1, "Basic Upgrade",
                  "A basic upgrade modifies an ore property by either addition, subtraction, multiplication, division, or modulo",
@@ -13,17 +16,20 @@ bundled_upg = (2, "Bundled Upgrade",
                "Select to bundle up different types of upgrades. EX: you want an upgrader that multiplies ore value and substracts ore Temperature.",
                "ore.forge.Strategies.UpgradeStrategies.BundledUpgrade")
 
-conditional_upg = (3, "Conditional Upgrade", "A conditional upgrade. Will on type of upgrade if the condition is true and an else upgrade if condition is false.", "ore.forge.Strategies.UpgradeStrategies.ConditionalUpgrade")
+conditional_upg = (3, "Conditional Upgrade",
+                   "A conditional upgrade. Will on type of upgrade if the condition is true and an else upgrade if condition is false.",
+                   "ore.forge.Strategies.UpgradeStrategies.ConditionalUpgrade")
 
 influenced_upg = (4, "Influenced Upgrade", "Modifier is influenced/determined by another factor.",
                   "ore.forge.Strategies.UpgradeStrategies.InfluencedUpgrade")
 
 resetter_upg = (
-5, "Resetter Upgrade", "Resets the upgrade tags of ore. Make sure to tag or as resetter if you want it to be balanced!",
-"ore.forge.Strategies.UpgradeStrategies.ResetterUpgrade")
+    5, "Resetter Upgrade",
+    "Resets the upgrade tags of ore. Make sure to tag or as resetter if you want it to be balanced!",
+    "ore.forge.Strategies.UpgradeStrategies.ResetterUpgrade")
 
 apply_effect_upg = (
-6, "Apply Effect", "Applies an effect to ore.", "ore.forge.Strategies.UpgradeStrategies.ApplyEffectUpgrade")
+    6, "Apply Effect", "Applies an effect to ore.", "ore.forge.Strategies.UpgradeStrategies.ApplyEffectUpgrade")
 
 destruction_upg = (7, "Destroy Ore", "Destroys Ore.", "ore.forge.Strategies.UpgradeStrategies.DestructionUpgrade")
 
@@ -66,7 +72,9 @@ multiply = (3, "Multiply", "Multiplies the value to modify by the modifier.", "M
 divide = (4, "Divide", "Divides the value to modify by the modifier.", "DIVIDE")
 exponent = (5, "Exponent", "Raises the value to modify to the power of the modifier.", "EXPONENT")
 assignment = (6, "Assignment", "Used to 'set' the value to modify to the value of the modifer.", "ASSIGNMENT")
-modulo = (7, "Modulo", "Applies the modulo operator to two values.(Returns the remainder after two numbers are divided).", "MODULO")
+modulo = (
+    7, "Modulo", "Applies the modulo operator to two values.(Returns the remainder after two numbers are divided).",
+    "MODULO")
 operations = [add, subtract, multiply, divide, exponent, assignment, modulo]
 
 
@@ -99,7 +107,7 @@ def create_bundled_upg():
         if result == "null":
             return bundle
         else:
-            bundle["upgStrat"+str(count)] = result
+            bundle["upgStrat" + str(count)] = result
 
 
 value = (1, "Ore Value", "The ores value.", "ORE_VALUE")
@@ -117,14 +125,15 @@ def prompt_for_condition():
 
 # [0] - AssociatedValue, [1]-Simple Name, [2] - Description, [3] - Real Name.
 greater_than = (
-1, "Greater Than", "Returns whether or not the specified value is greater than the threshold.", "GREATER_THAN")
+    1, "Greater Than", "Returns whether or not the specified value is greater than the threshold.", "GREATER_THAN")
 greater_than_equal_to = (
-2, "Greater Than or Equal To", "Returns whether or not the specified value is greater than or equal to the threshold.",
-"GREATER_THAN_EQUAL_TO")
+    2, "Greater Than or Equal To",
+    "Returns whether or not the specified value is greater than or equal to the threshold.",
+    "GREATER_THAN_EQUAL_TO")
 less_than = (3, "Less Than", "Returns whether or not a the specified value is less than the threshold.", "LESS_THAN")
 less_than_equal_to = (
-4, "Less Than or Equal To", "Returns whether or not the specified value is less than or equal to the threshold.",
-"LESS_THAN_EQUAL_TO")
+    4, "Less Than or Equal To", "Returns whether or not the specified value is less than or equal to the threshold.",
+    "LESS_THAN_EQUAL_TO")
 equal_to = (5, "Equal To", "Returns if a the specified value is equal to the threshold.", "EQUAL_TO")
 comparison_types = [greater_than, greater_than_equal_to, less_than, less_than_equal_to, equal_to]
 
@@ -184,10 +193,7 @@ def create_influenced_upg():
     data = {
         "upgradeName": influenced_upg[3],
         "upgradeFunction": prompt_for_upgrade_function(),
-        # "baseUpgrade": create_basic_upg(),
-        # "valueToModify": prompt_for_vtm(),
-        # "":
-        # ""
+        "valueToModify": prompt_for_vtm(influenced_upg[1]),
         "minModifier": optional_float_prompt("Would you like to set a min modifier? ",
                                              "Enter the minimum for the modifier: "),
         "maxModifier": optional_float_prompt("Would you like to set a max modifier? ",
@@ -203,36 +209,47 @@ def create_influenced_upg():
 
     return data
 
+
+# TODO: Add better error handling for parsing function and more informative feedback when there are errors in the inputs syntax
+# Verify that each parenthesis has a "partner"
+# Ideally we would be able to know exactly where the missing parenthesis is located and alert/notify the user.
 def prompt_for_upgrade_function():
-    #1st: We give them all the info they need to know for creating an upgradeFunction
-    #2nd: prompt them for their String.
-    #3rd: verify that the input is actually a valid upgradeFunction by "compiling" it. (aka just do what the java algorithm does and see if it works)
-    print("((ORE_VALUE * 2) + 20)")
-    user_input = input("Please enter your function, it should look similar to the function above: ")
-    user_input = re.sub("\\s", "", user_input) # Trim white space.
-    operand_stack = queue.LifoQueue
+    operand_stack = LifoQueue()
+    operator_stack = LifoQueue()
+    while True:
+        print("((ORE_VALUE * 2) + 20)")
+        untrimmed_input = input("Please enter your function, it should look similar to the function above: ")
+        trimmed_input = untrimmed_input.replace(r"\\s", "")
+        opening_paren_count = trimmed_input.count("(")
+        closing_paren_count = trimmed_input.count(")")
+        if opening_paren_count != closing_paren_count:
+            if opening_paren_count > closing_paren_count:
+                print("Your parenthesis do not match!")
+            continue  # continue tells the current loop to "restart itself" in this case that's the while loop
+        pattern = re.compile(r"([a-zA-Z_]+|\(|\)|\d+(\.\d+)?|\+|-|\*|/|=|%|\^)")
+        for token in re.finditer(pattern, trimmed_input):
+            token_string = token.group()
+            if token_string == "(":
+                pass
+            elif token_string == ")":
+                try:
+                    right_operand = operand_stack.get_nowait()
+                    left_operand = operand_stack.get_nowait()
+                    operator = operator_stack.get_nowait()
+                    function_string = "(" + left_operand + operator + right_operand + ")"
+                    operand_stack.put(function_string)
+                except queue.Empty:
+                    print(untrimmed_input + "Formatting is incorrect!")
+            elif is_numeric(token_string) or token_string in [tuple_field[3] for tuple_field in values_of_influence]:
+                operand_stack.put(token_string)
+            elif token_string in ["+", "-", "*", "/", "=", "%", "^"]:
+                operator_stack.put(token_string)
+            else:
+                print("Invalid input")
+                operand_stack.empty()
+                operator_stack.empty()
+        return operand_stack.get_nowait()
 
-    operator_stack = queue.LifoQueue()
-    match = re.match("([a-zA-Z_]+|\\(|\\)|\\d+(\\.\\d+)?|\\+|-|\\*|/|=|%|\\^)", user_input)
-    for token in match:
-        if token is "(":
-            print("")
-        elif token is ")":
-            right_operand = operand_stack.get
-            left_operand = operator_stack.get
-            operator = operator_stack.get()
-            function = (right_operand, operator, left_operand)
-        operand_stack.put(function)
-
-    return operand_stack.get
-
-
-
-
-
-
-
-    return 1
 
 def create_apply_effect():
     bundle = {

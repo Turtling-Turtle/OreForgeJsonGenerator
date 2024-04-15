@@ -2,6 +2,7 @@
 # @author Nathan Ulmen
 
 import json
+import random
 
 from Helper_Functions import prompt_for_boolean, Color, list_prompt
 from Item_Constructors import create_dropper, create_furnace, create_upgrader, create_conveyor
@@ -59,3 +60,4 @@ def main():
 
 
 main()
+
