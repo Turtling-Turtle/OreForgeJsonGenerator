@@ -3,7 +3,7 @@
 import queue
 
 from Helper_Functions import prompt_for_vtm, prompt_for_float, prompt_for_boolean, \
-    list_prompt, is_numeric
+    list_prompt, is_numeric, prompt_for_string
 from Ore_Strategies import prompt_for_ore_strategy
 from queue import LifoQueue
 import re
@@ -33,12 +33,17 @@ apply_effect_upg = (
 
 destruction_upg = (7, "Destroy Ore", "Destroys Ore.", "ore.forge.Strategies.UpgradeStrategies.DestructionUpgrade")
 
+cooldown_upg = (8, "Cooldown Upgrade", "Held upgrade has a cooldown after being applied",
+                "ore.forge.Strategies.UpgradeStrategies.CooldownUpgrade")
+
+incremental_upg = (9, "Incremental Upgrade", "The upgrades modifier is change if a condition is met, the modifier resets once it reaches a specific threshold.","ore.forge.Strategeis.UpgradStrategies.IncrementalUpgrade")
+
 # These will require oreStrategy creation to be implemented:
 # ApplyEffectUPG = StringIntPair('ApplyEffect', 8, "\tApplies an effect to the ore.")
 # TargetedCleanser = StringIntPair('TargetedCleanser', 9, " \tRemoves an effect from the ore.")
 
 upgrades = [basic_upgrade, bundled_upg, conditional_upg, influenced_upg, resetter_upg, apply_effect_upg,
-            destruction_upg]
+            destruction_upg, cooldown_upg]
 
 
 # [0] - AssociatedValue, [1]-Simple Name, [2] - Description, [3] - Real Name.
@@ -64,6 +69,8 @@ def prompt_for_upg_type(strat, can_return_zero):
         elif upgrade is destruction_upg:
             bundle = {"upgradeName": destruction_upg[3]}
             return bundle
+        elif upgrade is cooldown_upg:
+            return create_cooldown_upgrade()
 
 
 add = (1, "Add", "Adds the modifier to the value to modify.", "ADD")
@@ -78,7 +85,7 @@ modulo = (
 operations = [add, subtract, multiply, divide, exponent, assignment, modulo]
 
 
-def prompt_for_operation(prompt_string):
+def prompt_for_operator(prompt_string):
     while True:
         operator = list_prompt(operations, prompt_string, False)
         return operator[3]
@@ -88,7 +95,7 @@ def create_basic_upg():
     data = {
         "upgradeName": basic_upgrade[3],
         "valueToModify": prompt_for_vtm(basic_upgrade[1]),
-        "operation": prompt_for_operation("Which operation would you like this upgrade to utilize? "),
+        "operation": prompt_for_operator("Which operation would you like this upgrade to utilize? "),
         "modifier": prompt_for_float("Enter the modifier for your " + basic_upgrade[1] + ": ")
     }
     return data
@@ -117,6 +124,7 @@ multiore = (4, "Multiore", "The ores multiore.", "MULTIORE")
 comparison_fields = [value, upgrade_count, temperature, multiore]
 
 
+# TODO: update to verify that entered expression is valid.
 def prompt_for_condition():
     while True:
         condition = list_prompt(comparison_fields, "Which condition do you want to evaluate? ", False)
@@ -146,11 +154,10 @@ def prompt_for_comparison():
 def create_conditional_upg():
     bundle = {
         "upgradeName": conditional_upg[3],
-        "condition": prompt_for_condition(),
-        "comparison": prompt_for_comparison(),
-        "threshold": prompt_for_float("Threshold of the comparison:"),
-        "ifModifier": prompt_for_upg_type("true upgrade", False),
-        "elseModifier": prompt_for_upg_type("false upgrade", True)
+        # "condition": prompt_for_condition(),
+        "condition": prompt_for_string("Enter your condition: "),
+        "trueBranch": prompt_for_upg_type("true upgrade", False),
+        "falseBranch": prompt_for_upg_type("false upgrade", True)
     }
     return bundle
 
@@ -193,12 +200,12 @@ def create_influenced_upg():
     data = {
         "upgradeName": influenced_upg[3],
         "upgradeFunction": prompt_for_upgrade_function(),
+        "numericOperator": prompt_for_operator("How would you like this upgrade to be applied? "),
         "valueToModify": prompt_for_vtm(influenced_upg[1]),
         "minModifier": optional_float_prompt("Would you like to set a min modifier? ",
                                              "Enter the minimum for the modifier: "),
         "maxModifier": optional_float_prompt("Would you like to set a max modifier? ",
                                              "Enter the maximum for the modifier: "),
-        "scalar": prompt_for_float("Enter the scalar that is applied (Enter 1 if you dont want a scalar): ")
     }
 
     if data["minModifier"] == "null":
@@ -258,3 +265,57 @@ def create_apply_effect():
     }
 
     return bundle
+
+
+def create_cooldown_upgrade():
+    bundle = {
+        "upgradeName": cooldown_upg[3],
+        "upgrade": prompt_for_upg_type("Which upgrade would you like to be applied on a cooldown? ", False),
+        "cooldownTime": prompt_for_float("Enter the cooldown time in seconds: "),
+    }
+
+    return bundle
+
+# TODO: Make some of the prompts optional
+def create_incremental_upgrade():
+    bundle = {
+        "upgradeName": incremental_upg[3], 
+        "baseModifier": prompt_for_float("Enter the base Modifier: "),
+        "trueStep": prompt_for_upgrade_function(),
+        "trueBranchOperator": prompt_for_operator("How would you like the result of trueStep to be applied to the modifier?"),
+        "falseStep": prompt_for_upgrade_function(),
+        "falseBranchOperator": prompt_for_operator("How would you like the result of the falseStep to be applied to the modifier?"),
+        "numericOperator": prompt_for_operator("How do you want this upgrade to modify the ore property? "),
+        "valueToModify": prompt_for_vtm("Which value do you want this upgrade to be applied to? "),
+        "triggerCondition": prompt_for_string("Enter the trigger condition: "),
+        "threshold": prompt_for_upgrade_function(),
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
