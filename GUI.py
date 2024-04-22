@@ -1,3 +1,4 @@
+import json
 import sys
 
 from PyQt6.QtCore import Qt
@@ -35,9 +36,18 @@ def is_enabled(state):
 class ItemCreator(QWidget):
     def __init__(self):
         super().__init__()
+        self.item_type_combo = None
+        self.description_QLineEdit = None
+        self.speed_label = None
+        self.price_field = None
+        self.shop_checkbox = None
+        self.tier_combo_box = None
+        self.description_hbox = None
+        self.id = None
+        self.name_QLineEdit = None
         self.layout = None
         self.setWindowTitle("Ore Forge Item Creator")
-        # self.setFixedSize(600, 650)
+        self.setFixedSize(800, 250)
         # self.setWindowIcon(QIcon("icon.png"))
         self.initUI()
 
@@ -46,6 +56,7 @@ class ItemCreator(QWidget):
         self.setLayout(self.layout)
 
         self.essentials_hbox = QHBoxLayout()
+        self.generate_button = QPushButton("Generate Item")
 
         # ComboBox to choose item type
         item_type_label = QLabel(bold_string("Item Type:"))
@@ -60,6 +71,8 @@ class ItemCreator(QWidget):
         self.item_type_combo.addItem("Conveyor")
         # layout.addWidget(self.item_type_combo)
         self.essentials_hbox.addWidget(self.item_type_combo, Qt.AlignmentFlag.AlignLeft)
+
+        self.essentials_hbox.addWidget(self.generate_button, Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
         self.item_type_combo.currentIndexChanged.connect(self.on_item_type_changed)
 
         # Print button:
@@ -68,6 +81,8 @@ class ItemCreator(QWidget):
         self.layout.addLayout(self.essentials_hbox)
         self.essentials_hbox.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
         self.create_common_ui()
+
+        self.generate_button.clicked.connect(lambda: self.print_json_data())
         self.show()
 
     def on_item_type_changed(self):
@@ -95,30 +110,35 @@ class ItemCreator(QWidget):
 
     def create_common_ui(self):
         # Name Field
-        name_hbox = QHBoxLayout()
-        name_hbox.addWidget(QLabel(bold_string("Name:")))
-        name_hbox.addWidget(QLineEdit(), Qt.AlignmentFlag.AlignLeft)
-        self.layout.addLayout(name_hbox)
+        self.name_hbox = QHBoxLayout()
+        self.name_hbox.addWidget(QLabel(bold_string("Name:")))
+        self.name_QLineEdit = QLineEdit()
+        self.name_hbox.addWidget(self.name_QLineEdit, Qt.AlignmentFlag.AlignLeft)
+        self.layout.addLayout(self.name_hbox)
 
         # id
-        id_hbox = QHBoxLayout()
-        id_hbox.addWidget(QLabel(bold_string("ID:") + "\t" + generate_item_id()), Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
-        self.layout.addLayout(id_hbox)
+        self.id_hbox = QHBoxLayout()
+
+        self.id = generate_item_id()
+        self.id_hbox.addWidget(QLabel(bold_string("ID:") + "\t" + self.id),
+                               Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
+        self.layout.addLayout(self.id_hbox)
 
         # Description Field
-        description_hbox = QHBoxLayout()
-        description_hbox.addWidget(QLabel(bold_string("Description:")))
-        description_hbox.addWidget(QLineEdit())
-        self.layout.addLayout(description_hbox)
+        self.description_hbox = QHBoxLayout()
+        self.description_hbox.addWidget(QLabel(bold_string("Description:")))
+        self.description_QLineEdit = QLineEdit()
+        self.description_hbox.addWidget(self.description_QLineEdit, Qt.AlignmentFlag.AlignLeft)
+        self.layout.addLayout(self.description_hbox)
 
         # Tier Field
-        tier_hbox = QHBoxLayout()
-        tier_hbox.addWidget(QLabel(bold_string("Tier:")))
-        tier_combo_box = QComboBox()
+        self.tier_hbox = QHBoxLayout()
+        self.tier_hbox.addWidget(QLabel(bold_string("Tier:")))
+        self.tier_combo_box = QComboBox()
         for tier in valid_tiers:
-            tier_combo_box.addItem(tier[3] + " " + tier[2])
-        tier_hbox.addWidget(tier_combo_box, Qt.AlignmentFlag.AlignLeft)
-        self.layout.addLayout(tier_hbox)
+            self.tier_combo_box.addItem(tier[3])
+        self.tier_hbox.addWidget(self.tier_combo_box, Qt.AlignmentFlag.AlignLeft)
+        self.layout.addLayout(self.tier_hbox)
 
         self.shop_checkbox = QCheckBox("Shop Item")
         self.shop_checkbox.stateChanged.connect(self.toggle_price_field)
@@ -134,8 +154,6 @@ class ItemCreator(QWidget):
         self.layout.addLayout(price_layout)
 
         self.layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
-
-
 
     def toggle_price_field(self, state):
         if state == 2:
@@ -158,11 +176,62 @@ class ItemCreator(QWidget):
 
     def create_conveyor_ui(self):
         hbox = QHBoxLayout()
-        speed_label = QLabel(bold_string("Conveyor Speed:"))
-        speed_line = QLineEdit()
-        hbox.addWidget(speed_label, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
-        hbox.addWidget(speed_line, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
-        self.layout.addLayout(hbox)
+        self.speed_label = QLabel(bold_string("Conveyor Speed:"))
+        self.speed_line = QLineEdit()
+        hbox.addWidget(self.speed_label)
+        hbox.addWidget(self.speed_line)
+        self.layout.addLayout(hbox, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
+        hbox.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
+
+    def get_data(self):
+        item_data = {
+            "name": self.name_QLineEdit.text(),
+            "id": self.id,
+            "description": self.description_QLineEdit.text(),
+            "tier": self.tier_combo_box.currentText() if self.tier_combo_box is not None else "null",
+            "isShopItem": str(self.shop_checkbox.isChecked()).lower() if self.shop_checkbox is not None else "null",
+            "itemValue": self.price_field.text() if (
+                        self.shop_checkbox.isChecked() and self.price_field is not None) else "null"
+        }
+        item_data.update(self.get_item_specific_data())
+        return item_data
+
+    def get_item_specific_data(self):
+        text = self.item_type_combo.currentText()
+        if text == "Dropper":
+            return self.get_dropper_data()
+        elif text == "Furnace":
+            return self.get_furnace_data()
+        elif text == "Upgrader":
+            return self.get_upgrader_data()
+        elif text == "Conveyor":
+            return self.get_conveyor_data()
+        else:
+            return {}
+
+    def get_dropper_data(self):
+        pass
+
+    def get_furnace_data(self):
+        pass
+
+    def get_upgrader_data(self):
+        pass
+
+    def get_conveyor_data(self):
+        data = {
+            "blockLayout": [
+                [1, 1],
+                [1, 1]
+            ],
+            "conveyorSpeed": self.speed_line.text()
+        }
+        return data
+
+    def print_json_data(self):
+        data = self.get_data()
+        json_data = json.dumps(data, indent=4)
+        print(json_data)
 
 
 if __name__ == '__main__':
