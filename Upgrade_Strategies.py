@@ -80,7 +80,7 @@ subtract = (2, "Subtract", "Subtracts the modifier from the value to modify.", "
 multiply = (3, "Multiply", "Multiplies the value to modify by the modifier.", "MULTIPLY")
 divide = (4, "Divide", "Divides the value to modify by the modifier.", "DIVIDE")
 exponent = (5, "Exponent", "Raises the value to modify to the power of the modifier.", "EXPONENT")
-assignment = (6, "Assignment", "Used to 'set' the value to modify to the value of the modifer.", "ASSIGNMENT")
+assignment = (6, "Assignment", "Used to 'set' the value to modify to the value of the modifier.", "ASSIGNMENT")
 modulo = (
     7, "Modulo", "Applies the modulo operator to two values.(Returns the remainder after two numbers are divided).",
     "MODULO")
