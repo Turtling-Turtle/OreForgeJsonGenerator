@@ -7,6 +7,7 @@ from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QComboBox, QLineEdit,
     QHBoxLayout, QPushButton, QBoxLayout
 from abc import ABC, abstractmethod
 
+
 class Color:
     RED = "<font color='red'>"
     ORANGE = "<font color='orange'>"
@@ -18,7 +19,7 @@ class Color:
     GREEN = "<font color='green'>"
     END = "</font>"
 
-# element[0] is display name, element[1] is real/true name.
+
 # Values to Modify
 ore_value = ("Ore Value", "ORE_VALUE")
 temperature = ("Ore Temperature", "TEMPERATURE")
@@ -48,6 +49,7 @@ uncommon = (Color.GREEN + "Uncommon" + Color.END + "- TEMP DESCRIPTION - 8th RAR
 common = ("Common - TEMP DESCRIPTION - 9th RAREST", "COMMON")
 tiers = [pinnacle, special, exotic, prestige, epic, super_rare, rare, uncommon, common]
 
+
 def bold_string(text_to_bold):
     return "<b>" + text_to_bold + "</b>"
 
@@ -66,7 +68,8 @@ class InputField(QWidget, JsonSerializable):
         self.hbox = QHBoxLayout()
         self.isInteger = isInteger
         self.isFloat = isFloat
-        self.label = QLabel(bold_string(LabelName)).setFont(QFont("Arial", font_size))
+        self.label = QLabel(bold_string(LabelName))
+        self.label.setFont(QFont("Arial", font_size))
         self.lineEdit = QLineEdit()
         self.hbox.addWidget(self.label)
         self.hbox.addWidget(self.lineEdit)

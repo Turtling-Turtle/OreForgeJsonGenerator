@@ -117,6 +117,7 @@ class ItemCreator(QWidget):
         pass
 
     def create_common_ui(self):
+
         # Name Field
         self.name_hbox = QHBoxLayout()
         self.name_hbox.addWidget(QLabel(bold_string("Name:")))
@@ -143,6 +144,7 @@ class ItemCreator(QWidget):
         self.description_QLineEdit = QLineEdit()
         self.description_hbox.addWidget(self.description_QLineEdit, Qt.AlignmentFlag.AlignLeft)
         self.layout.addLayout(self.description_hbox)
+
         # self.description = InputField("Description:", 16)
         # self.layout.addWidget(self.description)
 
