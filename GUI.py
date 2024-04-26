@@ -9,7 +9,7 @@ from fontTools.merge import layout
 from Helper_Functions import valid_tiers
 from Item_Constructors import generate_item_id
 from StrategyChoices import UpgradeChoices
-from SubMenu import InputField, StrategyWidget, DropDownMenu, BasicUpgrade, BundledUpgrade, tiers
+from SubMenu import InputField,  DropDownMenu, BasicUpgrade, BundledUpgrade, tiers
 
 '''
 The Game Plan:

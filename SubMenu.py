@@ -40,6 +40,7 @@ modulo = ("Modulo - Returns the remainder after two numbers are divided.",
           "MODULO")
 numeric_operations = [add, subtract, multiply, divide, exponent, assignment, modulo]
 
+# Tiers.
 pinnacle = (Color.RED + "Pinnacle" + Color.END + "-TEMP DESCRIPTION- THE RAREST", "PINNACLE")
 special = (Color.ORANGE + "Special" + Color.END + "-TEMP DESCRIPTION- 2nd RAREST", "SPECIAL")
 exotic = (Color.YELLOW + "Exotic" + Color.END + "-TEMP DESCRIPTION - 3rd RAREST", "EXOTIC")
@@ -58,14 +59,12 @@ def bold_string(text_to_bold):
 
 # This should be treated as an interface
 class JsonSerializable:
-
     def to_json(self):
         pass
 
 
-# TODO: Make it so input field filters out invalid characters
+# TODO: Make it so input field filters out invalid characters(Ex: field that only takes numbers)
 class InputField(QWidget, JsonSerializable):
-
     def __init__(self, LabelName, font_size=14, isInteger=False, isFloat=False):
         super().__init__()
         self.hbox = QHBoxLayout()
@@ -113,62 +112,17 @@ class DropDownMenu(QWidget, JsonSerializable):
         return None
 
 
-# data = {
-#     "upgradeName": basic_upgrade[3],
-#     "valueToModify": prompt_for_vtm(basic_upgrade[1]),
-#     "operation": prompt_for_operator("Which operation would you like this upgrade to utilize? "),
-#     "modifier": prompt_for_float("Enter the modifier for your " + basic_upgrade[1] + ": ")
-# }
-class StrategyWidget(QHBoxLayout, JsonSerializable):
-    """A Strategy Widget is a collection of InputFields and is meant to encapsulate an Upgrade Strategy.
-    It's also responsible for returning all JSON info necessary for that particular upgrade strategy."""
-
-    def __init__(self, real_name, is_upgrade_strategy=False, is_ore_effect=False):
-        super().__init__()
-        self.real_name = real_name
-        self.isUpgradeStrategy = is_upgrade_strategy
-        self.isOreEffect = is_ore_effect
-        self.inputFields = []
-
-    def to_json(self):
-        if self.isUpgradeStrategy:
-            data = {"upgradeName": self.real_name}
-        elif self.isOreEffect:
-            data = {"effectName": self.real_name}
-        else:
-            raise Exception("Invalid strategy type")
-        for inputField in self.inputFields:
-            data.update(inputField.to_json())
-        return data
-
-    def appendInputField(self, inputField):
-        self.addWidget(inputField, Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
-        self.inputFields.append(inputField)
-
-
-class SubMenu(JsonSerializable):
-    def __init__(self, strategy_widgets):
-        self.strategyWidgets = strategy_widgets
-        pass
-
-    def to_json(self):
-        data = {}
-        for strategy in self.strategyWidgets:
-            data.update(strategy.to_json())
-        return data
-
-
 class BasicUpgrade(QWidget, JsonSerializable):
 
     def __init__(self):
         super().__init__()
         self.name = "Basic Upgrade"
-        self.nameLabel = QLabel(bold_string(self.name))
+        # self.nameLabel = QLabel(bold_string(self.name))
         self.vtm = DropDownMenu(vtms, "Value To Modify:")
         self.operation = DropDownMenu(numeric_operations, "Operator:")
         self.modifier = InputField("Modifier:", 12, False, True)
         self.hbox = QHBoxLayout()
-        self.hbox.addWidget(self.nameLabel)
+        # self.hbox.addWidget(self.nameLabel)
         self.hbox.addWidget(self.vtm)
         self.hbox.addWidget(self.operation)
         self.hbox.addWidget(self.modifier)
@@ -188,46 +142,35 @@ class BundledUpgrade(QWidget, JsonSerializable):
     def __init__(self):
         super().__init__()
         self.name = "Bundled Upgrade"
-        self.nameLabel = QLabel(bold_string(self.name))
-        self.index = 0
+        # self.nameLabel = QLabel(bold_string(self.name))
         self.upgradeCount = 0
         self.listOfUpgrades = []
-        self.hboxList = []
         self.layout = QVBoxLayout()
-        self.layout.addWidget(self.nameLabel)
-        self.addNewButton = QPushButton("Add New Upgrade")
-        self.addNewButton.clicked.connect(lambda: self.add_new_click())
+        # self.layout.addWidget(self.nameLabel)
+        self.adderButton = QPushButton("Add New Upgrade")
+        self.adderButton.clicked.connect(lambda: self.add_new_click())
         self.deleteButton = QPushButton("Delete Upgrade")
         self.deleteButton.clicked.connect(lambda: self.delete_click())
-        self.layout.addWidget(self.addNewButton)
+        self.layout.addWidget(self.adderButton)
         self.setLayout(self.layout)
 
     def add_upgrade(self):
         upgrade = StrategyChoices.UpgradeChoices()
-
         self.upgradeCount += 1
-
-        # upgrade.nameLabel.setText(str(self.upgradeCount) + ". " + upgrade.name + ":")
-
-        upgrade.label.setText("Upgrade" + str(self.upgradeCount))
-
+        upgrade.label.setText("Upgrade " + str(self.upgradeCount))
         self.layout.addWidget(upgrade)
         self.listOfUpgrades.append(upgrade)
 
         self.bind_buttons()
-
-    def remove_buttons(self):
-        self.layout.removeWidget(self.deleteButton)
-        self.layout.addWidget(self.addNewButton)
 
     def bind_buttons(self):
         if self.upgradeCount > 1:
             self.deleteButton.show()
         else:
             self.deleteButton.hide()
-        self.layout.addWidget(self.deleteButton)
-        self.layout.addWidget(self.addNewButton)
         self.layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
+        self.layout.addWidget(self.deleteButton)
+        self.layout.addWidget(self.adderButton)
 
     def add_new_click(self):
         self.add_upgrade()
@@ -253,24 +196,59 @@ class BundledUpgrade(QWidget, JsonSerializable):
 
 
 class ConditionalUpgrade(QWidget, JsonSerializable):
-
     def __init__(self):
         super().__init__()
+        self.conditionField = InputField("Condition:")
+        self.trueBranch = StrategyChoices.UpgradeChoices()
+        self.trueBranch.set_label_name("True Branch")
+        self.falseBranch = StrategyChoices.UpgradeChoices()
+        self.falseBranch.set_label_name("False Branch")
+        self.layout = QVBoxLayout()
+        self.layout.addWidget(self.conditionField)
+        self.layout.addWidget(self.trueBranch)
+        self.layout.addWidget(self.falseBranch)
+        self.setLayout(self.layout)
+
+    def to_json(self):
+        data = {
+            "upgradeName": "ore.forge.Strategies.UpgradeStrategies.ConditionalUpgrade",
+            "condition": self.conditionField.to_json(),
+            "trueBranch": self.trueBranch.to_json(),
+            "falseBranch": self.falseBranch.to_json(),
+        }
+        return data
+
 
 class InfluencedUpgrade(QWidget, JsonSerializable):
+
+    def to_json(self):
+        data = {
+            "upgradeName": "ore.forge.Strategies.UpgradeStrategies.InfluencedUpgrade",
+            "upgradeFunction": ...,
+            "numericOperator": ...,
+            "mindModifier": ...,
+            "maxModifier": ...,
+        }
+        return data
+
     pass
+
 
 class ResetterUpgrade(QWidget, JsonSerializable):
     pass
 
+
 class ApplyEffect(QWidget, JsonSerializable):
     pass
+
 
 class DestroyOre(QWidget, JsonSerializable):
     pass
 
+
 class CooldownUpgrade(QWidget, JsonSerializable):
     pass
+
 
 class IncrementalUpgrade(QWidget, JsonSerializable):
     pass
