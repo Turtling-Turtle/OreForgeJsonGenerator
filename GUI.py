@@ -8,6 +8,7 @@ from fontTools.merge import layout
 
 from Helper_Functions import valid_tiers
 from Item_Constructors import generate_item_id
+from StrategyChoices import UpgradeChoices
 from SubMenu import InputField, StrategyWidget, DropDownMenu, BasicUpgrade, BundledUpgrade, tiers
 
 '''
@@ -94,7 +95,7 @@ class ItemCreator(QWidget):
 
     def on_item_type_changed(self):
         text = self.item_type_combo.currentText()
-        self.clear_grid_layout()
+        self.clear_grid_layout(self.layout)
         self.create_common_ui()
         if text == "Dropper":
             self.create_dropper_ui()
@@ -105,7 +106,7 @@ class ItemCreator(QWidget):
         elif text == "Conveyor":
             self.create_conveyor_ui()
 
-    def clear_grid_layout(self):
+    def clear_grid_layout(self, layout):
         for i in reversed(range(self.layout.count())):
             layout_item = self.layout.itemAt(i)
             if layout_item is not None and layout_item != self.essentials_hbox:
@@ -114,7 +115,6 @@ class ItemCreator(QWidget):
                     if widget is not None:
                         widget.deleteLater()
                 self.layout.removeItem(layout_item)
-        pass
 
     def create_common_ui(self):
 
@@ -249,11 +249,16 @@ class ItemCreator(QWidget):
 
         furnaceHbox.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
         # TODO: Add support for upgradeStrategies...
-        bundled_upgrade = BundledUpgrade()
-        self.strategies = bundled_upgrade
+        # bundled_upgrade = BundledUpgrade()
+        # self.strategies = bundled_upgrade
+
+
 
         self.layout.addLayout(furnaceHbox)
-        self.layout.addWidget(bundled_upgrade)
+
+        self.strategies = UpgradeChoices()
+        self.layout.addWidget(self.strategies)
+        # self.layout.addWidget(bundled_upgrade)
 
 
 
@@ -265,7 +270,7 @@ class ItemCreator(QWidget):
         hbox = QHBoxLayout()
         self.speed_label = QLabel(bold_string("Conveyor Speed:"))
         self.speed_line = QLineEdit()
-        self.speed_line.setEnabled(False)
+        # self.speed_line.setEnabled(False)
         hbox.addWidget(self.speed_label)
         hbox.addWidget(self.speed_line)
         self.layout.addLayout(hbox, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)

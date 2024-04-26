@@ -4,8 +4,10 @@ import sys
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont
 from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QComboBox, QLineEdit, QCheckBox, QVBoxLayout, \
-    QHBoxLayout, QPushButton, QBoxLayout
+    QHBoxLayout, QPushButton, QBoxLayout, QSpacerItem, QSizePolicy
 from abc import ABC, abstractmethod
+
+import StrategyChoices
 
 
 class Color:
@@ -34,7 +36,7 @@ multiply = ("Multiply - Multiplies the value to modify by the modifier.", "MULTI
 divide = ("Divide - Divides the value to modify by the modifier.", "DIVIDE")
 exponent = ("Exponent - Raises the value to modify to the power of the modifier.", "EXPONENT")
 assignment = ("Assignment - Used to 'set' the value to modify to the value of the modifier.", "ASSIGNMENT")
-modulo = ("Modulo - Applies the modulo operator to two values.(Returns the remainder after two numbers are divided).",
+modulo = ("Modulo - Returns the remainder after two numbers are divided.",
           "MODULO")
 numeric_operations = [add, subtract, multiply, divide, exponent, assignment, modulo]
 
@@ -61,6 +63,7 @@ class JsonSerializable:
         pass
 
 
+# TODO: Make it so input field filters out invalid characters
 class InputField(QWidget, JsonSerializable):
 
     def __init__(self, LabelName, font_size=14, isInteger=False, isFloat=False):
@@ -159,11 +162,13 @@ class BasicUpgrade(QWidget, JsonSerializable):
 
     def __init__(self):
         super().__init__()
-        self.name = bold_string("Basic Upgrade")
+        self.name = "Basic Upgrade"
+        self.nameLabel = QLabel(bold_string(self.name))
         self.vtm = DropDownMenu(vtms, "Value To Modify:")
         self.operation = DropDownMenu(numeric_operations, "Operator:")
-        self.modifier = InputField("Modifier:", 14, False, True)
+        self.modifier = InputField("Modifier:", 12, False, True)
         self.hbox = QHBoxLayout()
+        self.hbox.addWidget(self.nameLabel)
         self.hbox.addWidget(self.vtm)
         self.hbox.addWidget(self.operation)
         self.hbox.addWidget(self.modifier)
@@ -182,31 +187,59 @@ class BasicUpgrade(QWidget, JsonSerializable):
 class BundledUpgrade(QWidget, JsonSerializable):
     def __init__(self):
         super().__init__()
-        self.upgradeCount = 0;
+        self.name = "Bundled Upgrade"
+        self.nameLabel = QLabel(bold_string(self.name))
+        self.index = 0
+        self.upgradeCount = 0
         self.listOfUpgrades = []
+        self.hboxList = []
         self.layout = QVBoxLayout()
-        self.pushButton = QPushButton("Add New Upgrade")
-        self.layout.addWidget(self.pushButton)
-        self.pushButton.clicked.connect(lambda: self.on_clicked())
+        self.layout.addWidget(self.nameLabel)
+        self.addNewButton = QPushButton("Add New Upgrade")
+        self.addNewButton.clicked.connect(lambda: self.add_new_click())
+        self.deleteButton = QPushButton("Delete Upgrade")
+        self.deleteButton.clicked.connect(lambda: self.delete_click())
+        self.layout.addWidget(self.addNewButton)
         self.setLayout(self.layout)
 
     def add_upgrade(self):
+        upgrade = StrategyChoices.UpgradeChoices()
+
         self.upgradeCount += 1
-        # Make DropDown Menu or something like that for all upgrade options.
-        hbox = QHBoxLayout()
-        upgrade = BasicUpgrade()
-        self.layout.removeWidget(self.pushButton)
-        upgradeName = QLabel(str(self.upgradeCount) + ". " + upgrade.name + ":")
-        upgradeName.setFont(QFont("Arial", 18))
-        hbox.addWidget(upgradeName)
-        hbox.addWidget(upgrade)
-        self.layout.addLayout(hbox)
-        self.layout.addWidget(self.pushButton)
+
+        # upgrade.nameLabel.setText(str(self.upgradeCount) + ". " + upgrade.name + ":")
+
+        upgrade.label.setText("Upgrade" + str(self.upgradeCount))
+
+        self.layout.addWidget(upgrade)
         self.listOfUpgrades.append(upgrade)
+
+        self.bind_buttons()
+
+    def remove_buttons(self):
+        self.layout.removeWidget(self.deleteButton)
+        self.layout.addWidget(self.addNewButton)
+
+    def bind_buttons(self):
+        if self.upgradeCount > 1:
+            self.deleteButton.show()
+        else:
+            self.deleteButton.hide()
+        self.layout.addWidget(self.deleteButton)
+        self.layout.addWidget(self.addNewButton)
         self.layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
 
-    def on_clicked(self):
+    def add_new_click(self):
         self.add_upgrade()
+
+    def delete_click(self):
+        if self.upgradeCount > 1:
+            self.upgradeCount -= 1
+            last = self.listOfUpgrades[-1]
+            self.listOfUpgrades.remove(last)
+            self.layout.removeWidget(last)
+            last.deleteLater()
+            self.bind_buttons()
 
     def to_json(self):
         data = {
@@ -223,3 +256,21 @@ class ConditionalUpgrade(QWidget, JsonSerializable):
 
     def __init__(self):
         super().__init__()
+
+class InfluencedUpgrade(QWidget, JsonSerializable):
+    pass
+
+class ResetterUpgrade(QWidget, JsonSerializable):
+    pass
+
+class ApplyEffect(QWidget, JsonSerializable):
+    pass
+
+class DestroyOre(QWidget, JsonSerializable):
+    pass
+
+class CooldownUpgrade(QWidget, JsonSerializable):
+    pass
+
+class IncrementalUpgrade(QWidget, JsonSerializable):
+    pass
