@@ -8,6 +8,8 @@ from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QComboBox, QLineEdit,
 from abc import ABC, abstractmethod
 
 import StrategyChoices
+from Helper_Functions import is_numeric
+from Validators import validate_function
 
 
 class Color:
@@ -62,6 +64,9 @@ class JsonSerializable:
     def to_json(self):
         pass
 
+    def isValid(self):
+        pass
+
 
 # TODO: Make it so input field filters out invalid characters(Ex: field that only takes numbers)
 class InputField(QWidget, JsonSerializable):
@@ -86,8 +91,24 @@ class InputField(QWidget, JsonSerializable):
 
         return self.lineEdit.text()
 
+    def clear(self):
+        self.lineEdit.setText("")
+
+    def setEnabled(self, enabled):
+        self.label.setEnabled(enabled)
+        self.lineEdit.setEnabled(enabled)
+
     def to_json(self):
         return self.getFieldData()
+
+    def isValid(self):
+        if self.isInteger or self.isFloat:
+            return is_numeric(self.lineEdit.text())
+        else:
+            return len(self.lineEdit.text()) > 0
+
+    def __str__(self):
+        return self.label.text()
 
 
 class DropDownMenu(QWidget, JsonSerializable):
@@ -105,11 +126,52 @@ class DropDownMenu(QWidget, JsonSerializable):
         self.hbox.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
         self.setLayout(self.hbox)
 
+    def clear(self):
+        pass
+
+    def setEnabled(self, enabled):
+        self.label.setEnabled(enabled)
+        self.comboBox.setEnabled(enabled)
+
     def to_json(self):
         for element in self.content:
             if element[0] == self.comboBox.currentText():
                 return element[1]
         return None
+
+    def isValid(self):
+        return True
+
+    def __str__(self):
+        return self.label.text()
+
+
+class OptionalField(QWidget, JsonSerializable):
+    def __init__(self, q_widget, check_box_prompt):
+        super().__init__()
+        self.checkBox = QCheckBox(check_box_prompt)
+        self.customWidget = q_widget
+        self.checkBox.stateChanged.connect(self.on_check_box_toggle)
+        self.layout = QHBoxLayout()
+
+        self.layout.addWidget(self.checkBox)
+        self.layout.addWidget(self.customWidget)
+        self.layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
+        self.setLayout(self.layout)
+        self.on_check_box_toggle(self.checkBox.stateChanged)
+
+    def on_check_box_toggle(self, state):
+        if state == 2:
+            self.customWidget.setEnabled(True)
+        else:
+            self.customWidget.clear()
+            self.customWidget.setEnabled(False)
+
+    def to_json(self):
+        return self.customWidget.to_json() if self.checkBox.isChecked() else None
+
+    def isValid(self):
+        return True
 
 
 class BasicUpgrade(QWidget, JsonSerializable):
@@ -136,6 +198,9 @@ class BasicUpgrade(QWidget, JsonSerializable):
             "modifier": self.modifier.to_json(),
         }
         return data
+
+    def isValid(self):
+        return self.vtm.isValid() and self.operation.isValid() and self.modifier.isValid()
 
 
 class BundledUpgrade(QWidget, JsonSerializable):
@@ -194,6 +259,9 @@ class BundledUpgrade(QWidget, JsonSerializable):
             count += 1
         return data
 
+    def isValid(self):
+        return all(upgrade.isValid() for upgrade in self.listOfUpgrades)
+
 
 class ConditionalUpgrade(QWidget, JsonSerializable):
     def __init__(self):
@@ -220,30 +288,67 @@ class ConditionalUpgrade(QWidget, JsonSerializable):
 
 
 class InfluencedUpgrade(QWidget, JsonSerializable):
+    def __init__(self):
+        super().__init__()
+        self.functionField = InputField("Custom Function:")
+        self.numericOperator = DropDownMenu(numeric_operations, "Operator:")
+        self.minModifier = OptionalField(InputField("Minimum Modifier", font_size=14, isInteger=False, isFloat=True),
+                                         "Set Minimum Modifier?")
+        self.maxModifier = OptionalField(InputField("Maximum Modifier:", font_size=14, isInteger=False, isFloat=True),
+                                         "Set Maximum Modifier?")
+
+        self.layout = QVBoxLayout()
+
+        self.layout.addWidget(self.functionField)
+        self.layout.addWidget(self.numericOperator)
+        self.layout.addWidget(self.minModifier)
+        self.layout.addWidget(self.maxModifier)
+        self.setLayout(self.layout)
 
     def to_json(self):
         data = {
             "upgradeName": "ore.forge.Strategies.UpgradeStrategies.InfluencedUpgrade",
-            "upgradeFunction": ...,
-            "numericOperator": ...,
-            "mindModifier": ...,
-            "maxModifier": ...,
+            "upgradeFunction": self.functionField.to_json(),
+            "numericOperator": self.numericOperator.to_json(),
+            "mindModifier": self.minModifier.to_json(),
+            "maxModifier": self.maxModifier.to_json(),
         }
+
         return data
 
-    pass
+    def isValid(self):
+        return (validate_function(self.functionField.getFieldData()) and self.numericOperator.isValid() and
+                self.minModifier.isValid() and self.maxModifier.isValid())
 
 
 class ResetterUpgrade(QWidget, JsonSerializable):
-    pass
+
+    def to_json(self):
+        data = {
+            "upgradeName": "ore.forge.Strategies.UpgradeStrategies.ResetterUpgrade",
+        }
+
+        return data
 
 
 class ApplyEffect(QWidget, JsonSerializable):
-    pass
+
+    def to_json(self):
+        data = {
+            "upgradeName": "ore.forge.Strategies.UpgradeStrategies.ApplyEffect",
+        }
+
+        return data
 
 
 class DestroyOre(QWidget, JsonSerializable):
-    pass
+
+    def to_json(self):
+        data = {
+            "upgradeName": "ore.forge.Strategies.UpgradeStrategies.DestroyOre",
+        }
+
+        return data
 
 
 class CooldownUpgrade(QWidget, JsonSerializable):
