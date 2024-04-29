@@ -224,7 +224,7 @@ class BundledUpgrade(QWidget, JsonSerializable):
         self.setLayout(self.layout)
 
     def add_upgrade(self):
-        upgrade = StrategyChoices.StrategyChoice(StrategyChoices.upgradeStrategies)
+        upgrade = StrategyChoice.StrategyChoice(StrategyChoice.upgradeStrategies)
         self.upgradeCount += 1
         upgrade.label.setText("Upgrade " + str(self.upgradeCount))
         self.layout.addWidget(upgrade)
@@ -276,9 +276,9 @@ class ConditionalUpgrade(QWidget, JsonSerializable):
         super().__init__()
         self.name = "Conditional Upgrade"
         self.conditionField = InputField("Condition:")
-        self.trueBranch = StrategyChoices.StrategyChoice(StrategyChoices.upgradeStrategies)
+        self.trueBranch = StrategyChoice.StrategyChoice(StrategyChoice.upgradeStrategies)
         self.trueBranch.set_label_name("True Branch")
-        self.falseBranch = StrategyChoices.StrategyChoice(StrategyChoices.upgradeStrategies)
+        self.falseBranch = StrategyChoice.StrategyChoice(StrategyChoice.upgradeStrategies)
         self.falseBranch.set_label_name("False Branch")
         self.layout = QVBoxLayout()
         self.layout.addWidget(self.conditionField)
