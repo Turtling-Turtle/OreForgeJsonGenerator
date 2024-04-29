@@ -7,7 +7,7 @@ from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QComboBox, QLineEdit,
     QHBoxLayout, QPushButton, QBoxLayout, QSpacerItem, QSizePolicy
 from abc import ABC, abstractmethod
 
-import StrategyChoices
+import StrategyChoice
 from Helper_Functions import is_numeric
 from Validators import validate_function
 
@@ -202,6 +202,10 @@ class BasicUpgrade(QWidget, JsonSerializable):
     def isValid(self):
         return self.vtm.isValid() and self.operation.isValid() and self.modifier.isValid()
 
+    def __str__(self):
+        self.name = "Basic Upgrade"
+        return self.name
+
 
 class BundledUpgrade(QWidget, JsonSerializable):
     def __init__(self):
@@ -220,7 +224,7 @@ class BundledUpgrade(QWidget, JsonSerializable):
         self.setLayout(self.layout)
 
     def add_upgrade(self):
-        upgrade = StrategyChoices.UpgradeChoices()
+        upgrade = StrategyChoices.StrategyChoice(StrategyChoices.upgradeStrategies)
         self.upgradeCount += 1
         upgrade.label.setText("Upgrade " + str(self.upgradeCount))
         self.layout.addWidget(upgrade)
@@ -260,16 +264,21 @@ class BundledUpgrade(QWidget, JsonSerializable):
         return data
 
     def isValid(self):
-        return all(upgrade.isValid() for upgrade in self.listOfUpgrades)
+        return all(upgrade.isValid for upgrade in self.listOfUpgrades)
+
+    def __str__(self):
+        self.name = "Bundled Upgrade"
+        return self.name
 
 
 class ConditionalUpgrade(QWidget, JsonSerializable):
     def __init__(self):
         super().__init__()
+        self.name = "Conditional Upgrade"
         self.conditionField = InputField("Condition:")
-        self.trueBranch = StrategyChoices.UpgradeChoices()
+        self.trueBranch = StrategyChoices.StrategyChoice(StrategyChoices.upgradeStrategies)
         self.trueBranch.set_label_name("True Branch")
-        self.falseBranch = StrategyChoices.UpgradeChoices()
+        self.falseBranch = StrategyChoices.StrategyChoice(StrategyChoices.upgradeStrategies)
         self.falseBranch.set_label_name("False Branch")
         self.layout = QVBoxLayout()
         self.layout.addWidget(self.conditionField)
@@ -286,17 +295,24 @@ class ConditionalUpgrade(QWidget, JsonSerializable):
         }
         return data
 
+    def isValid(self):
+        raise ValueError("Not IMPLEMENTED YET!!!")
+
+    def __str__(self):
+        self.name = "Conditional Upgrade"
+        return self.name
+
 
 class InfluencedUpgrade(QWidget, JsonSerializable):
     def __init__(self):
         super().__init__()
+        self.name = "Influenced Upgrade"
         self.functionField = InputField("Custom Function:")
         self.numericOperator = DropDownMenu(numeric_operations, "Operator:")
         self.minModifier = OptionalField(InputField("Minimum Modifier", font_size=14, isInteger=False, isFloat=True),
                                          "Set Minimum Modifier?")
         self.maxModifier = OptionalField(InputField("Maximum Modifier:", font_size=14, isInteger=False, isFloat=True),
                                          "Set Maximum Modifier?")
-
         self.layout = QVBoxLayout()
 
         self.layout.addWidget(self.functionField)
@@ -320,8 +336,20 @@ class InfluencedUpgrade(QWidget, JsonSerializable):
         return (validate_function(self.functionField.getFieldData()) and self.numericOperator.isValid() and
                 self.minModifier.isValid() and self.maxModifier.isValid())
 
+    def __str__(self):
+        self.name = "Influenced Upgrade"
+        return self.name
+
 
 class ResetterUpgrade(QWidget, JsonSerializable):
+
+    def __init__(self):
+        super().__init__()
+        self.label = QLabel("Resetter Upgrade")
+        self.label.setFont(QFont(bold_string("Arial"), 14))
+        self.layout = QVBoxLayout()
+        self.layout.addWidget(self.label)
+        self.setLayout(self.layout)
 
     def to_json(self):
         data = {
@@ -329,6 +357,13 @@ class ResetterUpgrade(QWidget, JsonSerializable):
         }
 
         return data
+
+    def isValid(self):
+        return True
+
+    def __str__(self):
+        self.name = "Resetter Upgrade"
+        return self.name
 
 
 class ApplyEffect(QWidget, JsonSerializable):
@@ -340,8 +375,20 @@ class ApplyEffect(QWidget, JsonSerializable):
 
         return data
 
+    def __str__(self):
+        self.name = "Apply Effect"
+        return self.name
+
 
 class DestroyOre(QWidget, JsonSerializable):
+
+    def __init__(self):
+        super().__init__()
+        self.label = QLabel("Destroy Ore Upgrade")
+        self.label.setFont(QFont(bold_string("Arial"), 14))
+        self.layout = QVBoxLayout()
+        self.layout.addWidget(self.label)
+        self.setLayout(self.layout)
 
     def to_json(self):
         data = {
@@ -350,10 +397,27 @@ class DestroyOre(QWidget, JsonSerializable):
 
         return data
 
+    def isValid(self):
+        return True
+
+    def __str__(self):
+        self.name = "Destroy Ore"
+        return self.name
+
 
 class CooldownUpgrade(QWidget, JsonSerializable):
-    pass
+
+    def __init__(self):
+        super().__init__()
+
+    def __str__(self):
+        self.name = "Cooldown Upgrade"
+        return self.name
 
 
 class IncrementalUpgrade(QWidget, JsonSerializable):
     pass
+
+    def __str__(self):
+        self.name = "Incremental Upgrade"
+        return self.name

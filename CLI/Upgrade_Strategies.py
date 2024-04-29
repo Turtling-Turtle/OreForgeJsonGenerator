@@ -4,7 +4,7 @@ import queue
 
 from Helper_Functions import prompt_for_vtm, prompt_for_float, prompt_for_boolean, \
     list_prompt, is_numeric, prompt_for_string
-from Ore_Strategies import prompt_for_ore_strategy
+from CLI.Ore_Strategies import prompt_for_ore_strategy
 from queue import LifoQueue
 import re
 

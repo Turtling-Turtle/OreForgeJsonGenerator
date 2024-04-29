@@ -2,14 +2,13 @@ import json
 import sys
 
 from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QComboBox, QLineEdit, QCheckBox, QVBoxLayout, \
+from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QComboBox, QVBoxLayout, \
     QHBoxLayout, QPushButton, QMessageBox
-from fontTools.merge import layout
 
-from Helper_Functions import valid_tiers
-from Item_Constructors import generate_item_id
-from StrategyChoices import UpgradeChoices
-from SubMenu import InputField, DropDownMenu, BasicUpgrade, BundledUpgrade, tiers, OptionalField, JsonSerializable
+import StrategyChoice
+from CLI.Item_Constructors import generate_item_id
+from StrategyChoice import StrategyChoice
+from SubMenu import InputField, DropDownMenu, tiers, OptionalField, JsonSerializable
 
 '''
 The Game Plan:
@@ -109,7 +108,7 @@ class ItemCreator(QWidget):
         self.id_label = QLabel(bold_string("ID:\t") + self.id)
         self.layout.addWidget(self.id_label)
 
-        self.description = InputField("Description:", 16)
+        self.description = InputField("Description:", 14)
         self.layout.addWidget(self.description)
 
         self.tier = DropDownMenu(tiers, "Tier:")
@@ -132,7 +131,7 @@ class ItemCreator(QWidget):
         self.oreName = InputField("Ore Name:")
         self.layout.addWidget(self.oreName)
 
-        self.oreValue = InputField("Ore Value:", font_size=14, isInteger=True)
+        self.oreValue = InputField("Ore Value:", font_size=14, isInteger=False, isFloat=True)
         self.layout.addWidget(self.oreValue)
 
         self.oreTemp = InputField("Ore Temp:", font_size=14, isInteger=False, isFloat=True)
@@ -148,27 +147,27 @@ class ItemCreator(QWidget):
         # oreStrategy
 
     def create_furnace_ui(self):
-
         self.pointReward = InputField("Special Point Reward", font_size=14, isInteger=True)
         self.layout.addWidget(self.pointReward)
-
         self.rewardThreshold = InputField("Special Point Reward Threshold:", font_size=14, isInteger=True)
         self.layout.addWidget(self.rewardThreshold)
-
-        # TODO: Add support for upgradeStrategies...
-        # bundled_upgrade = BundledUpgrade()
-        # self.strategies = bundled_upgrade
-
-        self.strategies = UpgradeChoices()
+        self.strategies = StrategyChoice(StrategyChoices.upgradeStrategies)
         self.layout.addWidget(self.strategies)
         self.layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
 
     def create_upgrader_ui(self):
-
-        pass
+        self.conveyorSpeed = InputField("Conveyor Speed:", font_size=14, isInteger=False, isFloat=True)
+        self.strategies = StrategyChoice(StrategyChoices.upgradeStrategies)
+        self.maxUpgrades = InputField("Max Upgrades:", font_size=14, isInteger=True)
+        # self.isResetter = OptionalField()
+        self.layout.addWidget(self.conveyorSpeed)
+        self.layout.addWidget(self.strategies)
+        self.layout.addWidget(self.maxUpgrades)
+        # self.layout.addWidget(self.isResetter)
+        self.layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
 
     def create_conveyor_ui(self):
-        self.conveyorSpeed = InputField("Conveyor Speed:", font_size=14, isInteger=True)
+        self.conveyorSpeed = InputField("Conveyor Speed:", font_size=14, isInteger=False, isFloat=True)
         self.layout.addWidget(self.conveyorSpeed)
         self.layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
 
@@ -176,7 +175,6 @@ class ItemCreator(QWidget):
         for i in reversed(range(self.layout.count())):
             item = self.layout.itemAt(i)
             widget = item.widget()
-            print(widget)
             if isinstance(widget, JsonSerializable):
                 if not widget.isValid():
                     return False
@@ -244,7 +242,21 @@ class ItemCreator(QWidget):
         return furnaceData
 
     def get_upgrader_data(self):
-        pass
+        upgraderData = {
+            "blockLayout": [
+                [2, 2],
+                [1, 1]
+            ],
+            "conveyorSpeed": self.conveyorSpeed.to_json(),
+            "upgrade": self.strategies.to_json(),
+            "upgradeTag": {
+                "name": self.name.to_json(),
+                "id": self.id.to_json(),
+                "maxUpgrades": self.maxUpgrades.to_json(),
+                # "isResetter": self.isResetter.to_json(),
+            }
+        }
+        return upgraderData
 
     def get_conveyor_data(self):
         data = {
