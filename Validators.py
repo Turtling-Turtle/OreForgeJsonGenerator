@@ -31,7 +31,9 @@ def validate_function(function_string):
     close_paren = trimmed_string.count(")")
     if open_paren != close_paren:
         # print("FAILED")
-        return False
+        return "Expression: " + trimmed_string + " has unbalanced parenthesis."
+    if open_paren == 0 or close_paren==0:
+        return "Expression: " + trimmed_string + " is missing required parenthesis."
     pattern = re.compile(r"([a-zA-Z_]+)|([-+]?\d*\.?\d+(?:[eE][-+]?\d+)?)|\(|\)|\+|-|\*|/|=|%|\^")
     # TODO: Implement Internal state machine for what token type to expect next to allow for better error messages.
     operand_count = 0
@@ -49,15 +51,21 @@ def validate_function(function_string):
                 operand_stack.put(function_string)
                 operand_count += 1
             except queue.Empty:
-                return False
+                # TODO expand to give more descriptive errors here.
+                return "Invalid Expression: " + trimmed_string
         elif is_numeric(token_string) or token_string in numeric_ore_fields or token_string in other_fields:
             operand_stack.put(token_string)
             operand_count += 1
         elif token_string in numeric_operators:
             operator_stack.put(token_string)
         else:
-            return False
-    return operator_stack.empty() and operand_count == 1
+            return "Invalid token " + token_string + " in" + trimmed_string
+    if not operator_stack.empty():
+        # Need to improve.
+        return "Invalid Expression: " + trimmed_string + " operators remaining without operands."
+    elif operand_count != 1:
+        return "Too many operands"
+    return
 
 
 function_test_strings = [

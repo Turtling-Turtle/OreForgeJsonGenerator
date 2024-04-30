@@ -2,23 +2,17 @@ import json
 import sys
 
 from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QFont
 from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QComboBox, QVBoxLayout, \
     QHBoxLayout, QPushButton, QMessageBox
 
 import StrategyChoice
 from CLI.Item_Constructors import generate_item_id
-from StrategyChoice import StrategyChoice
+from StrategyChoice import StrategyChoiceField
 from SubMenu import InputField, DropDownMenu, tiers, OptionalField, JsonSerializable
 
-'''
-The Game Plan:
-All prompts that are list based(Upgrades, item tier, etc.) can be converted to use a drop down menu using QComboBox.
-Prompts that take strings/input from keyboard can be converted to a text box using QLineEdit.
-Boolean prompts can be converted to a checkbox.
 
-    For Bundled upgrade Im thinking that theres a button called "add Another..." and you can just click it to add another upgrade.
-'''
-
+# TODO: add tool tips for fields.
 
 def bold_string(text_to_bold):
     return "<b>" + text_to_bold + "</b>"
@@ -106,6 +100,7 @@ class ItemCreator(QWidget):
 
         self.id = generate_item_id()
         self.id_label = QLabel(bold_string("ID:\t") + self.id)
+        self.id_label.setFont(QFont("Arial", 14))
         self.layout.addWidget(self.id_label)
 
         self.description = InputField("Description:", 14)
@@ -151,18 +146,18 @@ class ItemCreator(QWidget):
         self.layout.addWidget(self.pointReward)
         self.rewardThreshold = InputField("Special Point Reward Threshold:", font_size=14, isInteger=True)
         self.layout.addWidget(self.rewardThreshold)
-        self.strategies = StrategyChoice(StrategyChoices.upgradeStrategies)
+        self.strategies = StrategyChoiceField(StrategyChoice.upgradeStrategies)
         self.layout.addWidget(self.strategies)
         self.layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
 
     def create_upgrader_ui(self):
         self.conveyorSpeed = InputField("Conveyor Speed:", font_size=14, isInteger=False, isFloat=True)
-        self.strategies = StrategyChoice(StrategyChoices.upgradeStrategies)
         self.maxUpgrades = InputField("Max Upgrades:", font_size=14, isInteger=True)
+        self.strategies = StrategyChoiceField(StrategyChoice.upgradeStrategies)
         # self.isResetter = OptionalField()
         self.layout.addWidget(self.conveyorSpeed)
-        self.layout.addWidget(self.strategies)
         self.layout.addWidget(self.maxUpgrades)
+        self.layout.addWidget(self.strategies)
         # self.layout.addWidget(self.isResetter)
         self.layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
 
@@ -172,16 +167,20 @@ class ItemCreator(QWidget):
         self.layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
 
     def validate_data(self):
+        errorList = []
         for i in reversed(range(self.layout.count())):
             item = self.layout.itemAt(i)
             widget = item.widget()
-            if isinstance(widget, JsonSerializable):
-                if not widget.isValid():
-                    return False
-        return True
+            if isinstance(widget, JsonSerializable) and widget.isValid() is not None:
+                if isinstance(widget.isValid(), list):
+                    errorList.extend(widget.isValid())
+                else:
+                    errorList.append(widget.isValid())
+        return errorList
 
     def get_data(self):
-        if self.validate_data():
+        errorList = self.validate_data()
+        if len(errorList) == 0:
             item_data = {
                 "name": self.name.to_json(),
                 "id": self.id,
@@ -196,8 +195,11 @@ class ItemCreator(QWidget):
         else:
             error_box = QMessageBox()
             error_box.setWindowTitle("Validation Error")
-            error_box.setText("Data validation failed. Please check the input fields.")
             error_box.setIcon(QMessageBox.Icon.Critical)
+            error_text = "Data validation failed."
+            for error in errorList:
+                error_text += "\n" + error
+            error_box.setText(error_text)
             error_box.exec()
 
     def get_item_specific_data(self):
@@ -270,8 +272,9 @@ class ItemCreator(QWidget):
 
     def print_json_data(self):
         data = self.get_data()
-        json_data = json.dumps(data, indent=4)
-        print(json_data)
+        if data is not None:
+            json_data = json.dumps(data, indent=4)
+            print(json_data)
 
 
 if __name__ == '__main__':

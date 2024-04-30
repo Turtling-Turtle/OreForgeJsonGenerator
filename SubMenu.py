@@ -4,12 +4,22 @@ import sys
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont
 from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QComboBox, QLineEdit, QCheckBox, QVBoxLayout, \
-    QHBoxLayout, QPushButton, QBoxLayout, QSpacerItem, QSizePolicy
+    QHBoxLayout, QPushButton, QBoxLayout, QSpacerItem, QSizePolicy, QToolTip
 from abc import ABC, abstractmethod
 
 import StrategyChoice
 from Helper_Functions import is_numeric
 from Validators import validate_function
+
+"""
+Types of Errors:
+    * Field filled out incorrectly(not putting an int or float in a field that only accepts and int or float.)
+    * A required field is left empty.
+    * Syntax error(a function or condition has incorrect syntax/is invalid)
+        * Give more descriptive errors based on the syntax error. 
+    
+    
+"""
 
 
 class Color:
@@ -72,6 +82,7 @@ class JsonSerializable:
 class InputField(QWidget, JsonSerializable):
     def __init__(self, LabelName, font_size=14, isInteger=False, isFloat=False):
         super().__init__()
+        self.name = LabelName
         self.hbox = QHBoxLayout()
         self.isInteger = isInteger
         self.isFloat = isFloat
@@ -102,10 +113,19 @@ class InputField(QWidget, JsonSerializable):
         return self.getFieldData()
 
     def isValid(self):
-        if self.isInteger or self.isFloat:
-            return is_numeric(self.lineEdit.text())
-        else:
-            return len(self.lineEdit.text()) > 0
+        if len(self.lineEdit.text()) <= 0:
+            return "*" + self.name + " is empty"
+        elif self.isInteger:
+            try:
+                int(self.lineEdit.text())
+                return
+            except ValueError:
+                return "* Input in " + self.name + " field is not an integer"
+        elif self.isFloat:
+            if is_numeric(self.lineEdit.text()):
+                return
+            else:
+                return "* Input in " + self.name + " field is not a valid float"
 
     def __str__(self):
         return self.label.text()
@@ -116,6 +136,7 @@ class DropDownMenu(QWidget, JsonSerializable):
     def __init__(self, content, label_name):
         super().__init__()
         self.label = QLabel(bold_string(label_name))
+        self.label.setFont(QFont("Arial", 14))
         self.comboBox = QComboBox()
         self.content = content
         for element in content:
@@ -140,7 +161,7 @@ class DropDownMenu(QWidget, JsonSerializable):
         return None
 
     def isValid(self):
-        return True
+        return
 
     def __str__(self):
         return self.label.text()
@@ -171,7 +192,7 @@ class OptionalField(QWidget, JsonSerializable):
         return self.customWidget.to_json() if self.checkBox.isChecked() else None
 
     def isValid(self):
-        return True
+        return
 
 
 class BasicUpgrade(QWidget, JsonSerializable):
@@ -200,7 +221,7 @@ class BasicUpgrade(QWidget, JsonSerializable):
         return data
 
     def isValid(self):
-        return self.vtm.isValid() and self.operation.isValid() and self.modifier.isValid()
+        return self.modifier.isValid()
 
     def __str__(self):
         self.name = "Basic Upgrade"
@@ -224,7 +245,7 @@ class BundledUpgrade(QWidget, JsonSerializable):
         self.setLayout(self.layout)
 
     def add_upgrade(self):
-        upgrade = StrategyChoice.StrategyChoice(StrategyChoice.upgradeStrategies)
+        upgrade = StrategyChoice.StrategyChoiceField(StrategyChoice.upgradeStrategies)
         self.upgradeCount += 1
         upgrade.label.setText("Upgrade " + str(self.upgradeCount))
         self.layout.addWidget(upgrade)
@@ -264,7 +285,11 @@ class BundledUpgrade(QWidget, JsonSerializable):
         return data
 
     def isValid(self):
-        return all(upgrade.isValid for upgrade in self.listOfUpgrades)
+        fields = []
+        for upgrade in self.listOfUpgrades:
+            if upgrade.isValid() is not None:
+                fields.append(upgrade.isValid())
+        return fields
 
     def __str__(self):
         self.name = "Bundled Upgrade"
@@ -276,9 +301,9 @@ class ConditionalUpgrade(QWidget, JsonSerializable):
         super().__init__()
         self.name = "Conditional Upgrade"
         self.conditionField = InputField("Condition:")
-        self.trueBranch = StrategyChoice.StrategyChoice(StrategyChoice.upgradeStrategies)
+        self.trueBranch = StrategyChoice.StrategyChoiceField(StrategyChoice.upgradeStrategies)
         self.trueBranch.set_label_name("True Branch")
-        self.falseBranch = StrategyChoice.StrategyChoice(StrategyChoice.upgradeStrategies)
+        self.falseBranch = StrategyChoice.StrategyChoiceField(StrategyChoice.upgradeStrategies)
         self.falseBranch.set_label_name("False Branch")
         self.layout = QVBoxLayout()
         self.layout.addWidget(self.conditionField)
@@ -333,8 +358,12 @@ class InfluencedUpgrade(QWidget, JsonSerializable):
         return data
 
     def isValid(self):
-        return (validate_function(self.functionField.getFieldData()) and self.numericOperator.isValid() and
-                self.minModifier.isValid() and self.maxModifier.isValid())
+        if self.functionField.isValid() is not None:
+            return self.functionField.isValid()
+        elif validate_function(self.functionField.getFieldData()) is not None:
+            return validate_function(self.functionField.getFieldData())
+        # TODO: Implement min and max Modifiers.
+        return
 
     def __str__(self):
         self.name = "Influenced Upgrade"
@@ -359,7 +388,7 @@ class ResetterUpgrade(QWidget, JsonSerializable):
         return data
 
     def isValid(self):
-        return True
+        return
 
     def __str__(self):
         self.name = "Resetter Upgrade"
@@ -398,7 +427,7 @@ class DestroyOre(QWidget, JsonSerializable):
         return data
 
     def isValid(self):
-        return True
+        return
 
     def __str__(self):
         self.name = "Destroy Ore"

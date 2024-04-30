@@ -32,7 +32,7 @@ oreEffects = {
 }
 
 
-class StrategyChoice(QWidget, JsonSerializable):
+class StrategyChoiceField(QWidget, JsonSerializable):
     def __init__(self, strategies):
         super().__init__()
         self.menu = QComboBox()
