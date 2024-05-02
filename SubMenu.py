@@ -80,15 +80,17 @@ class JsonSerializable:
 
 # TODO: Make it so input field filters out invalid characters(Ex: field that only takes numbers)
 class InputField(QWidget, JsonSerializable):
-    def __init__(self, LabelName, font_size=14, isInteger=False, isFloat=False):
+    def __init__(self, LabelName, font_size=14, isInteger=False, isFloat=False, label_tip=None, edit_tip=None):
         super().__init__()
         self.name = LabelName
         self.hbox = QHBoxLayout()
         self.isInteger = isInteger
         self.isFloat = isFloat
         self.label = QLabel(bold_string(LabelName))
+        self.label.setToolTip(label_tip)
         self.label.setFont(QFont("Arial", font_size))
         self.lineEdit = QLineEdit()
+        self.lineEdit.setToolTip(label_tip)
         self.hbox.addWidget(self.label)
         self.hbox.addWidget(self.lineEdit)
         self.hbox.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
@@ -99,7 +101,6 @@ class InputField(QWidget, JsonSerializable):
             return int(self.lineEdit.text())
         elif self.isFloat:
             return float(self.lineEdit.text())
-
         return self.lineEdit.text()
 
     def clear(self):
@@ -130,14 +131,26 @@ class InputField(QWidget, JsonSerializable):
     def __str__(self):
         return self.label.text()
 
+    def set_label_tip(self, text):
+        self.label.setToolTip(text)
+
+    def set_edit_tip(self, text):
+        self.lineEdit.setToolTip(text)
+
+    def set_both_tips(self, text):
+        self.set_label_tip(text)
+        self.set_edit_tip(text)
+
 
 class DropDownMenu(QWidget, JsonSerializable):
     # element[0] is display name, element[1] is real/true name.
-    def __init__(self, content, label_name):
+    def __init__(self, content, label_name, label_tip=None, box_tip=None):
         super().__init__()
         self.label = QLabel(bold_string(label_name))
         self.label.setFont(QFont("Arial", 14))
+        self.label.setToolTip(label_tip)
         self.comboBox = QComboBox()
+        self.comboBox.setToolTip(box_tip)
         self.content = content
         for element in content:
             self.comboBox.addItem(element[0])
@@ -168,7 +181,7 @@ class DropDownMenu(QWidget, JsonSerializable):
 
 
 class OptionalField(QWidget, JsonSerializable):
-    def __init__(self, q_widget, check_box_prompt):
+    def __init__(self, q_widget, check_box_prompt, boolean_field, widget_field):
         super().__init__()
         self.checkBox = QCheckBox(check_box_prompt)
         self.customWidget = q_widget
@@ -178,6 +191,9 @@ class OptionalField(QWidget, JsonSerializable):
         self.layout.addWidget(self.checkBox)
         self.layout.addWidget(self.customWidget)
         self.layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
+
+        self.booleanField = boolean_field
+        self.widget_field = widget_field
         self.setLayout(self.layout)
         self.on_check_box_toggle(self.checkBox.stateChanged)
 
@@ -189,10 +205,16 @@ class OptionalField(QWidget, JsonSerializable):
             self.customWidget.setEnabled(False)
 
     def to_json(self):
-        return self.customWidget.to_json() if self.checkBox.isChecked() else None
+        pass
 
     def isValid(self):
-        return
+        pass
+
+    def setIsValid(self, function):
+        self.isValid = function
+
+    def set_to_json(self, method):
+        self.to_json = method
 
 
 class BasicUpgrade(QWidget, JsonSerializable):
@@ -243,6 +265,7 @@ class BundledUpgrade(QWidget, JsonSerializable):
         self.deleteButton.clicked.connect(lambda: self.delete_click())
         self.layout.addWidget(self.adderButton)
         self.setLayout(self.layout)
+        self.add_upgrade()
 
     def add_upgrade(self):
         upgrade = StrategyChoice.StrategyChoiceField(StrategyChoice.upgradeStrategies)
@@ -335,9 +358,20 @@ class InfluencedUpgrade(QWidget, JsonSerializable):
         self.functionField = InputField("Custom Function:")
         self.numericOperator = DropDownMenu(numeric_operations, "Operator:")
         self.minModifier = OptionalField(InputField("Minimum Modifier", font_size=14, isInteger=False, isFloat=True),
-                                         "Set Minimum Modifier?")
+                                         "Set Minimum Modifier?", None, "minModifier")
         self.maxModifier = OptionalField(InputField("Maximum Modifier:", font_size=14, isInteger=False, isFloat=True),
-                                         "Set Maximum Modifier?")
+                                         "Set Maximum Modifier?", None, "maxModifier")
+
+        valid = lambda self: self.customWidget.isValid() if self.checkBox.isChecked() else None
+
+        json = lambda self: {self.widget_field: self.customWidget.to_json()} if self.checkBox.isChecked() else None
+
+        self.minModifier.setIsValid(lambda: valid(self.minModifier))
+        self.minModifier.set_to_json(lambda: json(self.minModifier))
+
+        self.maxModifier.setIsValid(lambda: valid(self.maxModifier))
+        self.maxModifier.set_to_json(lambda: json(self.maxModifier))
+
         self.layout = QVBoxLayout()
 
         self.layout.addWidget(self.functionField)
@@ -351,19 +385,28 @@ class InfluencedUpgrade(QWidget, JsonSerializable):
             "upgradeName": "ore.forge.Strategies.UpgradeStrategies.InfluencedUpgrade",
             "upgradeFunction": self.functionField.to_json(),
             "numericOperator": self.numericOperator.to_json(),
-            "mindModifier": self.minModifier.to_json(),
-            "maxModifier": self.maxModifier.to_json(),
         }
+        if self.minModifier.to_json() is not None:
+            data.update(self.minModifier.to_json())
+        if self.maxModifier.to_json() is not None:
+            data.update(self.maxModifier.to_json())
 
         return data
 
     def isValid(self):
-        if self.functionField.isValid() is not None:
-            return self.functionField.isValid()
-        elif validate_function(self.functionField.getFieldData()) is not None:
-            return validate_function(self.functionField.getFieldData())
-        # TODO: Implement min and max Modifiers.
-        return
+        results = [
+            validate_function(self.functionField.getFieldData()),
+            self.functionField.isValid(),
+            self.minModifier.isValid(),
+            self.maxModifier.isValid()
+        ]
+
+        errors = []
+        for element in results:
+            if element is not None:
+                errors.append(element)
+
+        return errors
 
     def __str__(self):
         self.name = "Influenced Upgrade"

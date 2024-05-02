@@ -9,7 +9,7 @@ All json Objects produced are readable by the json parser in personal project.
  Droppers produce/mine Ore. They are responsible for setting the base properties(Value, temperature, Multi-Ore) and effects of the ore.
  - **Ore Name:** Name of the ore. 
 
- - **Ore Value:** This of the value of the ore and is fundamental to the game. When sold this value is added to the players wallet.
+ - **Ore Value:** This of the value of the ore and is fundamental to the game. When sold this value is added to the players' wallet.
 
  - **Ore Temperature:** The temperature of the ore. 0 represents a neural/default value. Temperature vales that are less
 than zero indicates that the ore is cold and values greater than 0 indicate that the ore is warm. Temperature is used to

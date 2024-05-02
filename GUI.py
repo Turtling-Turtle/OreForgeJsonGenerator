@@ -1,5 +1,6 @@
 import json
 import sys
+from typing import Dict
 
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont
@@ -12,7 +13,10 @@ from StrategyChoice import StrategyChoiceField
 from SubMenu import InputField, DropDownMenu, tiers, OptionalField, JsonSerializable
 
 
+# @author Nathan Ulmen
+
 # TODO: add tool tips for fields.
+
 
 def bold_string(text_to_bold):
     return "<b>" + text_to_bold + "</b>"
@@ -95,21 +99,33 @@ class ItemCreator(QWidget):
                 widget.deleteLater()
 
     def create_common_ui(self):
-        self.name = InputField("Name:")
+        self.name = InputField("Name:", label_tip="Name of the Item", edit_tip="Name of the Item")
         self.layout.addWidget(self.name)
 
         self.id = generate_item_id()
         self.id_label = QLabel(bold_string("ID:\t") + self.id)
+        self.id_label.setToolTip("The items ID....UNFINISHED")
         self.id_label.setFont(QFont("Arial", 14))
         self.layout.addWidget(self.id_label)
 
-        self.description = InputField("Description:", 14)
+        self.description = InputField("Description:", 14, edit_tip="Description of the Item",
+                                      label_tip="Description of the Item")
         self.layout.addWidget(self.description)
 
-        self.tier = DropDownMenu(tiers, "Tier:")
+        self.tier = DropDownMenu(tiers, "Tier:", label_tip="The Tier of the Item", box_tip="The Tier of the Item")
         self.layout.addWidget(self.tier)
 
-        self.shopItemField = OptionalField(InputField("Item Price", font_size=14, isInteger=True), "Shop Item")
+        self.shopItemField = OptionalField(InputField("Item Price", isInteger=True),
+                                           "Shop Item", "isShopItem", "itemValue")
+        to_json_implmentation = lambda self: {
+            self.booleanField: self.checkBox.isChecked(),
+            self.widget_field: self.customWidget.to_json() if self.checkBox.isChecked() else 0,
+        }
+        self.shopItemField.set_to_json(lambda: to_json_implmentation(self.shopItemField))
+
+        isValidImplementation = lambda self: self.customWidget.isValid() if self.checkBox.isChecked() else None
+        self.shopItemField.setIsValid(lambda: isValidImplementation(self.shopItemField))
+
         self.layout.addWidget(self.shopItemField)
 
         self.layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
@@ -123,36 +139,42 @@ class ItemCreator(QWidget):
 
     def create_dropper_ui(self):
 
-        self.oreName = InputField("Ore Name:")
+        self.oreName = InputField("Ore Name:", label_tip="The Name of the ore.", edit_tip="Name of the ore")
         self.layout.addWidget(self.oreName)
 
-        self.oreValue = InputField("Ore Value:", font_size=14, isInteger=False, isFloat=True)
+        self.oreValue = InputField("Ore Value:", isFloat=True)
         self.layout.addWidget(self.oreValue)
+        self.oreValue.set_both_tips("When an Ore is sold the Ore Value is added to the players' wallet.")
 
-        self.oreTemp = InputField("Ore Temp:", font_size=14, isInteger=False, isFloat=True)
+        self.oreTemp = InputField("Ore Temp:", isFloat=True)
         self.layout.addWidget(self.oreTemp)
+        self.oreTemp.set_both_tips("The temperature of the ore. 0 represents a neural/default value. Temperature vales "
+                                   "that are less than zero indicates that the ore is cold and values greater than 0 indicate that the ore is warm.")
 
-        self.multiore = InputField("Multiore:", font_size=14, isInteger=True)
+        self.multiore = InputField("Multiore:", isInteger=True)
         self.layout.addWidget(self.multiore)
+        self.multiore.set_both_tips("Allows the player to increase the number of ore without needing to drop more ore."
+                                    "Functions as a \"multiplier\" for the number of ore.")
 
-        self.dropInterval = InputField("Drop Interval:", font_size=14, isInteger=False, isFloat=True)
+        self.dropInterval = InputField("Drop Interval:", isFloat=True)
         self.layout.addWidget(self.dropInterval)
+        self.dropInterval.set_both_tips("The interval in seconds in which the dropper produces a new Ore")
 
         self.layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
         # oreStrategy
 
     def create_furnace_ui(self):
-        self.pointReward = InputField("Special Point Reward", font_size=14, isInteger=True)
+        self.pointReward = InputField("Special Point Reward", isInteger=True)
         self.layout.addWidget(self.pointReward)
-        self.rewardThreshold = InputField("Special Point Reward Threshold:", font_size=14, isInteger=True)
+        self.rewardThreshold = InputField("Special Point Reward Threshold:", isInteger=True)
         self.layout.addWidget(self.rewardThreshold)
         self.strategies = StrategyChoiceField(StrategyChoice.upgradeStrategies)
         self.layout.addWidget(self.strategies)
         self.layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
 
     def create_upgrader_ui(self):
-        self.conveyorSpeed = InputField("Conveyor Speed:", font_size=14, isInteger=False, isFloat=True)
-        self.maxUpgrades = InputField("Max Upgrades:", font_size=14, isInteger=True)
+        self.conveyorSpeed = InputField("Conveyor Speed:", isFloat=True)
+        self.maxUpgrades = InputField("Max Upgrades:", isInteger=True)
         self.strategies = StrategyChoiceField(StrategyChoice.upgradeStrategies)
         # self.isResetter = OptionalField()
         self.layout.addWidget(self.conveyorSpeed)
@@ -162,13 +184,13 @@ class ItemCreator(QWidget):
         self.layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
 
     def create_conveyor_ui(self):
-        self.conveyorSpeed = InputField("Conveyor Speed:", font_size=14, isInteger=False, isFloat=True)
+        self.conveyorSpeed = InputField("Conveyor Speed:", isFloat=True)
         self.layout.addWidget(self.conveyorSpeed)
         self.layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
 
     def validate_data(self):
         errorList = []
-        for i in reversed(range(self.layout.count())):
+        for i in range(self.layout.count()):
             item = self.layout.itemAt(i)
             widget = item.widget()
             if isinstance(widget, JsonSerializable) and widget.isValid() is not None:
@@ -190,6 +212,7 @@ class ItemCreator(QWidget):
                 # "itemValue": int(self.price_field.text()) if (
                 #             self.shop_checkbox.isChecked() and self.price_field is not None) else 0
             }
+            item_data.update(self.shopItemField.to_json())
             item_data.update(self.get_item_specific_data())
             return item_data
         else:
@@ -253,7 +276,7 @@ class ItemCreator(QWidget):
             "upgrade": self.strategies.to_json(),
             "upgradeTag": {
                 "name": self.name.to_json(),
-                "id": self.id.to_json(),
+                "id": self.id,
                 "maxUpgrades": self.maxUpgrades.to_json(),
                 # "isResetter": self.isResetter.to_json(),
             }

@@ -23,25 +23,57 @@ logical_operators = ["NOT", "XOR", "AND", "OR"]
 numeric_operators = ["+", "-", "*", "/", "=", "%", "^"]
 
 
+def is_negative(string):
+    digit = re.search(r'(-?\d*\.?\d+(?:[eE]-?\d+)?)', string)
+    return digit is not None and digit.group() is not None
+
+def is_operand(string):
+    return string in numeric_ore_fields or string in other_fields or is_numeric(string) or string == ")"
+
 def validate_function(function_string):
+    trimmed_function = function_string.replace(r"(\d+)([-+])(\\d+)", "$1 $2 $3")
+    open_paren = trimmed_function.count("(")
+    close_paren = trimmed_function.count(")")
+    if open_paren != close_paren:
+        return "Expression: " + trimmed_function + " has unbalanced parenthesis."
+    if open_paren == 0 or close_paren == 0:
+        return "Expression: " + trimmed_function + " is missing required parenthesis."
+    pattern = re.compile(r"([a-zA-Z_]+)|(-?\d*\.?\d+(?:[eE]-?\d+)?)|\(|\)|\+|-|\*|/|=|%|\^")
     operand_stack = LifoQueue()
     operator_stack = LifoQueue()
-    trimmed_string = function_string.replace(r"(\d+)([-+])(\\d+)", "$1 $2 $3")
-    open_paren = trimmed_string.count("(")
-    close_paren = trimmed_string.count(")")
-    if open_paren != close_paren:
-        # print("FAILED")
-        return "Expression: " + trimmed_string + " has unbalanced parenthesis."
-    if open_paren == 0 or close_paren==0:
-        return "Expression: " + trimmed_string + " is missing required parenthesis."
-    pattern = re.compile(r"([a-zA-Z_]+)|([-+]?\d*\.?\d+(?:[eE][-+]?\d+)?)|\(|\)|\+|-|\*|/|=|%|\^")
     # TODO: Implement Internal state machine for what token type to expect next to allow for better error messages.
+
+    tokens = []
+    for token in re.finditer(pattern, trimmed_function):
+        tokens.append(token.group())
+
     operand_count = 0
-    for token in re.finditer(pattern, trimmed_string):
-        token_string = token.group()
-        if token_string == "(":
+    previous_token = None
+    next_token = None
+    expected = None
+    for i in range(0, len(tokens)):
+
+        current_token = tokens[i]
+
+        if i > 0:
+            previous_token = tokens[i - 1]
+        else:
+            previous_token = None
+
+        if i < len(tokens) - 1:
+            next_token = tokens[i + 1]
+        else:
+            next_token = None
+        # Correct function so that we don't mistake a subtraction for a negative.
+        if previous_token is not None and next_token is not None:
+            if is_operand(previous_token) and next_token == ")" and is_negative(current_token):
+                operator_stack.put("- ")
+                operand_stack.put(current_token.replace("-", ""))
+                operand_count += 1
+                continue
+        if current_token == "(":
             pass
-        elif token_string == ")":
+        elif current_token == ")":
             try:
                 right_operand = operand_stack.get_nowait()
                 left_operand = operand_stack.get_nowait()
@@ -52,34 +84,50 @@ def validate_function(function_string):
                 operand_count += 1
             except queue.Empty:
                 # TODO expand to give more descriptive errors here.
-                return "Invalid Expression: " + trimmed_string
-        elif is_numeric(token_string) or token_string in numeric_ore_fields or token_string in other_fields:
-            operand_stack.put(token_string)
+                return "Invalid Expression: " + trimmed_function
+        elif is_numeric(current_token) or current_token in numeric_ore_fields or current_token in other_fields:
+            operand_stack.put(current_token)
             operand_count += 1
-        elif token_string in numeric_operators:
-            operator_stack.put(token_string)
+        elif current_token in numeric_operators:
+            operator_stack.put(current_token)
         else:
-            return "Invalid token " + token_string + " in" + trimmed_string
+            return "Invalid token " + current_token + " in" + trimmed_function
     if not operator_stack.empty():
         # Need to improve.
-        return "Invalid Expression: " + trimmed_string + " operators remaining without operands."
+        return "Invalid Expression: " + trimmed_function + " operators remaining without operands."
     elif operand_count != 1:
         return "Too many operands"
     return
 
 
 function_test_strings = [
-    "(ORE_VALUE + -TEMPERATURE)",  # Invalid
-    "(-2.56E10 / ACTIVE_ORE)",  # Valid
-    "(ORE_VALUE * -0.1)",  # Valid
-    "(SPEED*-2)",  # Valid
-    "((ORE_VALUE + TEMPERATURE) + 20)",  # Valid
-    "((SPEED + 2.5) * TEMPERATURE)",  # Valid
-    "(UPGRADE_COUNT - 20) +20",  # Invalid
-    "(INVALID_FIELD * 2)",  # Invalid
-    "(UPGRADE_COUNT / 0)",  # Valid
-    "((ORE_VALUE + TEMPERATURE) *)",  # Invalid
-    "(ID = '123' AND WALLET + 1000)"  # Invalid
+    "(2 + 3)",
+    "(4 * (5 - 2))",
+    "((8 / 2) ^ 2)",
+    "(6 % 4)",
+    "(ORE_VALUE + TEMPERATURE)",
+    "(MULTIORE / SPEED)",
+    "(UPGRADE_COUNT = 10)",
+    #
+    "((ORE_VALUE * 5) + (TEMPERATURE / 2))",
+    "(MULTIORE - (SPEED * 2))",
+    "(ORE_VALUE -1)",
+    "((UPGRADE_COUNT % 3) = 1)",
+    # Negative Number Tests
+    "(-3 + 7)",
+    "(4 * -2)",
+    "((8 / -2) ^ 2)",
+    "(-6 % -4)",
+    "(-4 --3)",
+    # Invalid Strings
+    "(2 + * 3)",
+    "(4 * (5 - ))",
+    "(8 / 2) ^ 2)",
+    "(6 %)",
+
+    #Other
+    "ORE_VALUE * 2) + 20) + ORE_VALUE * 2)) (((("
+
 ]
 
 
