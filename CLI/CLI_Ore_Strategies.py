@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # @author Nathan Ulmen
 from Helper_Functions import prompt_for_float, list_prompt, prompt_for_int
-from CLI import Upgrade_Strategies
+from CLI import CLI_Upgrade_Strategies
 
 # BundledEffect = ("ore.forge.Strategies.OreEffects.BundledEffect", "Bundled Effect", 0, '')
 # burning = ("ore.forge.Strategies.OreEffects.Burning", "Burning", 1,

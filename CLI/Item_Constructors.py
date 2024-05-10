@@ -2,7 +2,7 @@ import random
 
 from Helper_Functions import Color, prompt_for_string, prompt_for_tier, prompt_for_boolean, prompt_for_float, \
     prompt_for_int
-from CLI.Upgrade_Strategies import prompt_for_upg_type
+from CLI.CLI_Upgrade_Strategies import prompt_for_upg_type
 
 
 # @author Nathan Ulmen

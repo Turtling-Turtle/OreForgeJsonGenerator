@@ -27,9 +27,19 @@ def is_negative(string):
     digit = re.search(r'(-?\d*\.?\d+(?:[eE]-?\d+)?)', string)
     return digit is not None and digit.group() is not None
 
+
 def is_operand(string):
     return string in numeric_ore_fields or string in other_fields or is_numeric(string) or string == ")"
 
+
+def has_numeric_char(string):
+    for char in string:
+        if char.isdigit():
+            return True
+    return False
+
+
+# Returns an error message(String) if it fails to validate the function otherwise it returns the LifoQueue that holds the validated function.
 def validate_function(function_string):
     trimmed_function = function_string.replace(r"(\d+)([-+])(\\d+)", "$1 $2 $3")
     open_paren = trimmed_function.count("(")
@@ -48,22 +58,14 @@ def validate_function(function_string):
         tokens.append(token.group())
 
     operand_count = 0
-    previous_token = None
-    next_token = None
-    expected = None
     for i in range(0, len(tokens)):
-
+        previous_token = tokens[i - 1] if i > 0 else None
         current_token = tokens[i]
+        next_token = tokens[i + 1] if i < len(tokens) - 1 else None
 
-        if i > 0:
-            previous_token = tokens[i - 1]
-        else:
-            previous_token = None
+        # if has_numeric_char(current_token):
+        #     current_token.replace(r",", "")
 
-        if i < len(tokens) - 1:
-            next_token = tokens[i + 1]
-        else:
-            next_token = None
         # Correct function so that we don't mistake a subtraction for a negative.
         if previous_token is not None and next_token is not None:
             if is_operand(previous_token) and next_token == ")" and is_negative(current_token):
@@ -85,7 +87,7 @@ def validate_function(function_string):
             except queue.Empty:
                 # TODO expand to give more descriptive errors here.
                 return "Invalid Expression: " + trimmed_function
-        elif is_numeric(current_token) or current_token in numeric_ore_fields or current_token in other_fields:
+        elif current_token in numeric_ore_fields or current_token in other_fields or is_numeric(current_token):
             operand_stack.put(current_token)
             operand_count += 1
         elif current_token in numeric_operators:
@@ -97,11 +99,15 @@ def validate_function(function_string):
         return "Invalid Expression: " + trimmed_function + " operators remaining without operands."
     elif operand_count != 1:
         return "Too many operands"
-    return
+    return operand_stack
 
 
 function_test_strings = [
+    "ORE_VALUE * 2) * 2) *2) -2) *2) *2) -99E99) -2909) +39999E200) (((((((((",
+    "(4,000 + 2,000)",
     "(2 + 3)",
+    "(-2 - -3)",
+    "(-8300 --1.0)",
     "(4 * (5 - 2))",
     "((8 / 2) ^ 2)",
     "(6 % 4)",
@@ -124,10 +130,8 @@ function_test_strings = [
     "(4 * (5 - ))",
     "(8 / 2) ^ 2)",
     "(6 %)",
-
     #Other
-    "ORE_VALUE * 2) + 20) + ORE_VALUE * 2)) (((("
-
+    "ORE_VALUE * 2) + 20) + ORE_VALUE * 2)) ((((",
 ]
 
 

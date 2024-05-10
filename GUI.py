@@ -1,36 +1,39 @@
 import json
 import sys
-from typing import Dict
 
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont
 from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QComboBox, QVBoxLayout, \
-    QHBoxLayout, QPushButton, QMessageBox
+    QHBoxLayout, QPushButton, QMessageBox, QCheckBox
 
 import StrategyChoice
+from StrategyChoice import upgradeStrategies
 from CLI.Item_Constructors import generate_item_id
 from StrategyChoice import StrategyChoiceField
-from SubMenu import InputField, DropDownMenu, tiers, OptionalField, JsonSerializable
+from GUI_Upgrade_Strategies import Color
+from CustomWidgets import InputField, DropDownMenu, OptionalField, JsonSerializable
+
+# Tiers
+pinnacle = (Color.RED + "Pinnacle" + Color.END + "-TEMP DESCRIPTION- THE RAREST", "PINNACLE")
+special = (Color.ORANGE + "Special" + Color.END + "-TEMP DESCRIPTION- 2nd RAREST", "SPECIAL")
+exotic = (Color.YELLOW + "Exotic" + Color.END + "-TEMP DESCRIPTION - 3rd RAREST", "EXOTIC")
+prestige = (Color.CYAN + "Prestige" + Color.END + "-TEMP DESCRIPTION -4 RAREST", "PRESTIGE")
+epic = (Color.PURPLE + "Epic" + Color.END + "-TEMP DESCRIPTION -5th RAREST", "EPIC")
+superRare = (Color.DARKCYAN + "Super Rare" + Color.END + "-TEMP DESCRIPTION -6th RAREST", "SUPER_RARE")
+rare = (Color.BLUE + "Rare" + Color.END + " - TEMP DESCRIPTION - 7th RAREST", "RARE")
+uncommon = (Color.GREEN + "Uncommon" + Color.END + "- TEMP DESCRIPTION - 8th RAREST", "UNCOMMON")
+common = ("Common - TEMP DESCRIPTION - 9th RAREST", "COMMON")
+tiers = [pinnacle, special, exotic, prestige, epic, superRare, rare, uncommon, common]
 
 
 # @author Nathan Ulmen
 
-# TODO: add tool tips for fields.
-
-
-def bold_string(text_to_bold):
+def bold_string(text_to_bold: str):
     return "<b>" + text_to_bold + "</b>"
 
 
-def underline_string(text_to_underline):
+def underline_string(text_to_underline: str):
     return "<u>" + text_to_underline + "</u>"
-
-
-def is_enabled(state):
-    if state == 2:
-        state.setEnabled(True)
-    else:
-        state.setEnabled(False)
 
 
 class ItemCreator(QWidget):
@@ -63,34 +66,34 @@ class ItemCreator(QWidget):
         self.essentials_hbox.addWidget(self.item_type_combo, Qt.AlignmentFlag.AlignLeft)
 
         self.essentials_hbox.addWidget(self.generate_button, Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
-        self.item_type_combo.currentIndexChanged.connect(self.on_item_type_changed)
+        self.item_type_combo.currentIndexChanged.connect(self.onItemTypeChange)
 
         # Print button:
 
         # Grid layout for item attributes
         self.layout.addLayout(self.essentials_hbox)
         self.essentials_hbox.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
-        self.create_common_ui()
+        self.createCommonUI()
 
         self.generate_button.clicked.connect(
-            lambda: self.print_json_data())  #https://stackoverflow.com/questions/40982518/argument-1-has-unexpected-type-nonetype
-        self.on_item_type_changed()
+            lambda: self.printJsonData())  #https://stackoverflow.com/questions/40982518/argument-1-has-unexpected-type-nonetype
+        self.onItemTypeChange()
         self.show()
 
-    def on_item_type_changed(self):
+    def onItemTypeChange(self):
         text = self.item_type_combo.currentText()
-        self.clear_grid_layout()
-        self.create_common_ui()
+        self.clearLayout()
+        self.createCommonUI()
         if text == "Dropper":
-            self.create_dropper_ui()
+            self.createDropperUI()
         elif text == "Furnace":
-            self.create_furnace_ui()
+            self.createFurnaceUI()
         elif text == "Upgrader":
-            self.create_upgrader_ui()
+            self.createUpgraderUI()
         elif text == "Conveyor":
-            self.create_conveyor_ui()
+            self.createConveyorUI()
 
-    def clear_grid_layout(self):
+    def clearLayout(self):
         for i in reversed(range(self.layout.count())):
             item = self.layout.itemAt(i)
             widget = item.widget()
@@ -98,7 +101,7 @@ class ItemCreator(QWidget):
             if widget is not None:
                 widget.deleteLater()
 
-    def create_common_ui(self):
+    def createCommonUI(self):
         self.name = InputField("Name:", label_tip="Name of the Item", edit_tip="Name of the Item")
         self.layout.addWidget(self.name)
 
@@ -115,13 +118,14 @@ class ItemCreator(QWidget):
         self.tier = DropDownMenu(tiers, "Tier:", label_tip="The Tier of the Item", box_tip="The Tier of the Item")
         self.layout.addWidget(self.tier)
 
-        self.shopItemField = OptionalField(InputField("Item Price", isInteger=True),
-                                           "Shop Item", "isShopItem", "itemValue")
+        self.shopItemField = OptionalField(InputField("Item Price", isInteger=True), "Shop Item?", "isShopItem",
+                                           "itemValue")
         to_json_implmentation = lambda self: {
-            self.booleanField: self.checkBox.isChecked(),
-            self.widget_field: self.customWidget.to_json() if self.checkBox.isChecked() else 0,
+            self.booleanJsonKey: self.checkBox.isChecked(),
+            # "isShopItem": self.checkBox.isChecked(),
+            self.widgetJsonKey: self.customWidget.toJson() if self.checkBox.isChecked() else 0,
         }
-        self.shopItemField.set_to_json(lambda: to_json_implmentation(self.shopItemField))
+        self.shopItemField.setToJson(lambda: to_json_implmentation(self.shopItemField))
 
         isValidImplementation = lambda self: self.customWidget.isValid() if self.checkBox.isChecked() else None
         self.shopItemField.setIsValid(lambda: isValidImplementation(self.shopItemField))
@@ -130,14 +134,14 @@ class ItemCreator(QWidget):
 
         self.layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
 
-    def toggle_price_field(self, state):
+    def togglePriceField(self, state):
         if state == 2:
             self.price_field.setEnabled(True)
         else:
             self.price_field.clear()
             self.price_field.setEnabled(False)
 
-    def create_dropper_ui(self):
+    def createDropperUI(self):
 
         self.oreName = InputField("Ore Name:", label_tip="The Name of the ore.", edit_tip="Name of the ore")
         self.layout.addWidget(self.oreName)
@@ -160,60 +164,73 @@ class ItemCreator(QWidget):
         self.layout.addWidget(self.dropInterval)
         self.dropInterval.set_both_tips("The interval in seconds in which the dropper produces a new Ore")
 
+        self.strategies = StrategyChoiceField(StrategyChoice.oreEffects, "Ore Effect")
+        self.dropperStrategy = OptionalField(self.strategies, "Ore Effect")
+
+        json_behavior = lambda self: self.customWidget.toJson() if self.checkBox.isChecked() else None
+        self.dropperStrategy.setToJson(lambda: json_behavior(self.dropperStrategy))
+
+        is_valid_behavior = lambda self: self.customWidget.isValid() if self.checkBox.isChecked() else None
+        self.dropperStrategy.setIsValid(lambda: is_valid_behavior(self.dropperStrategy))
+        self.layout.addWidget(self.dropperStrategy)
+
         self.layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
         # oreStrategy
 
-    def create_furnace_ui(self):
+    def createFurnaceUI(self):
         self.pointReward = InputField("Special Point Reward", isInteger=True)
         self.layout.addWidget(self.pointReward)
         self.rewardThreshold = InputField("Special Point Reward Threshold:", isInteger=True)
         self.layout.addWidget(self.rewardThreshold)
-        self.strategies = StrategyChoiceField(StrategyChoice.upgradeStrategies)
+        self.strategies = StrategyChoiceField(upgradeStrategies, "Process Effect")
         self.layout.addWidget(self.strategies)
         self.layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
 
-    def create_upgrader_ui(self):
+    def createUpgraderUI(self):
         self.conveyorSpeed = InputField("Conveyor Speed:", isFloat=True)
         self.maxUpgrades = InputField("Max Upgrades:", isInteger=True)
-        self.strategies = StrategyChoiceField(StrategyChoice.upgradeStrategies)
+        self.strategies = StrategyChoiceField(upgradeStrategies, "Upgrade")
         # self.isResetter = OptionalField()
+        self.isResetter = QCheckBox("Resets Ore?")
         self.layout.addWidget(self.conveyorSpeed)
         self.layout.addWidget(self.maxUpgrades)
         self.layout.addWidget(self.strategies)
-        # self.layout.addWidget(self.isResetter)
+        self.layout.addWidget(self.isResetter)
         self.layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
 
-    def create_conveyor_ui(self):
+    def createConveyorUI(self):
         self.conveyorSpeed = InputField("Conveyor Speed:", isFloat=True)
         self.layout.addWidget(self.conveyorSpeed)
         self.layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
 
-    def validate_data(self):
+    def validateData(self):
         errorList = []
         for i in range(self.layout.count()):
             item = self.layout.itemAt(i)
             widget = item.widget()
-            if isinstance(widget, JsonSerializable) and widget.isValid() is not None:
-                if isinstance(widget.isValid(), list):
-                    errorList.extend(widget.isValid())
-                else:
-                    errorList.append(widget.isValid())
+            if isinstance(widget, JsonSerializable):
+                result = widget.isValid()
+                if result is not None:
+                    if isinstance(result, list):
+                        errorList.extend(result)
+                    elif result:
+                        errorList.append(result)
         return errorList
 
-    def get_data(self):
-        errorList = self.validate_data()
+    def getData(self):
+        errorList = self.validateData()
         if len(errorList) == 0:
             item_data = {
-                "name": self.name.to_json(),
+                "name": self.name.toJson(),
                 "id": self.id,
-                "description": self.description.to_json(),
-                "tier": self.tier.to_json(),
+                "description": self.description.toJson(),
+                "tier": self.tier.toJson(),
                 # "isShopItem": str(self.shop_checkbox.isChecked()).lower() if self.shop_checkbox is not None else "null",
                 # "itemValue": int(self.price_field.text()) if (
                 #             self.shop_checkbox.isChecked() and self.price_field is not None) else 0
             }
-            item_data.update(self.shopItemField.to_json())
-            item_data.update(self.get_item_specific_data())
+            item_data.update(self.shopItemField.toJson())
+            item_data.update(self.getItemSpecificData())
             return item_data
         else:
             error_box = QMessageBox()
@@ -225,76 +242,76 @@ class ItemCreator(QWidget):
             error_box.setText(error_text)
             error_box.exec()
 
-    def get_item_specific_data(self):
+    def getItemSpecificData(self):
         text = self.item_type_combo.currentText()
         if text == "Dropper":
-            return self.get_dropper_data()
+            return self.getDropperData()
         elif text == "Furnace":
-            return self.get_furnace_data()
+            return self.getFurnaceData()
         elif text == "Upgrader":
-            return self.get_upgrader_data()
+            return self.getUpgraderData()
         elif text == "Conveyor":
-            return self.get_conveyor_data()
+            return self.getConveyorData()
         else:
             return {}
 
-    def get_dropper_data(self):
+    def getDropperData(self):
         dropperData = {
             "blockLayout": [
                 [0, 3, 0],
                 [0, 0, 0],
                 [0, 0, 0],
             ],
-            "oreName": self.oreName.to_json(),
-            "oreValue": self.oreValue.to_json(),
-            "oreTemp": self.oreTemp.to_json(),
-            "multiOre": self.multiore.to_json(),
-            "dropInterval": self.dropInterval.to_json(),
-            # "oreStrategy":
+            "oreName": self.oreName.toJson(),
+            "oreValue": self.oreValue.toJson(),
+            "oreTemp": self.oreTemp.toJson(),
+            "multiOre": self.multiore.toJson(),
+            "dropInterval": self.dropInterval.toJson(),
+            "oreStrategy": self.dropperStrategy.toJson()
         }
         return dropperData
 
-    def get_furnace_data(self):
+    def getFurnaceData(self):
         furnaceData = {
             "blockLayout": [
                 [4, 4],
                 [4, 4],
             ],
-            "specialPointReward": self.pointReward.to_json(),
-            "rewardThreshold": self.rewardThreshold.to_json(),
-            "upgrade": self.strategies.to_json()
+            "specialPointReward": self.pointReward.toJson(),
+            "rewardThreshold": self.rewardThreshold.toJson(),
+            "upgrade": self.strategies.toJson()
         }
         return furnaceData
 
-    def get_upgrader_data(self):
+    def getUpgraderData(self):
         upgraderData = {
             "blockLayout": [
                 [2, 2],
                 [1, 1]
             ],
-            "conveyorSpeed": self.conveyorSpeed.to_json(),
-            "upgrade": self.strategies.to_json(),
+            "conveyorSpeed": self.conveyorSpeed.toJson(),
+            "upgrade": self.strategies.toJson(),
             "upgradeTag": {
-                "name": self.name.to_json(),
+                "name": self.name.toJson(),
                 "id": self.id,
-                "maxUpgrades": self.maxUpgrades.to_json(),
-                # "isResetter": self.isResetter.to_json(),
+                "maxUpgrades": self.maxUpgrades.toJson(),
+                "isResetter": True if self.isResetter.isChecked() else False
             }
         }
         return upgraderData
 
-    def get_conveyor_data(self):
+    def getConveyorData(self):
         data = {
             "blockLayout": [
                 [1, 1],
                 [1, 1]
             ],
-            "conveyorSpeed": self.conveyorSpeed.to_json()
+            "conveyorSpeed": self.conveyorSpeed.toJson()
         }
         return data
 
-    def print_json_data(self):
-        data = self.get_data()
+    def printJsonData(self):
+        data = self.getData()
         if data is not None:
             json_data = json.dumps(data, indent=4)
             print(json_data)
