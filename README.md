@@ -1,4 +1,4 @@
-﻿# Item-Json-Generator
+﻿# Item Json Generator
 This tool is designed to make creating your own custom items for my personal project/game as straightforward and easy as possible.
 All json Objects produced are readable by the json parser in personal project.
 
