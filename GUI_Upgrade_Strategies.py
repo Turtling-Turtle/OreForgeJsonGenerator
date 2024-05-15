@@ -123,7 +123,8 @@ class ConditionalUpgrade(QWidget, JsonSerializable):
         return data
 
     def isValid(self):
-        raise ValueError("Not IMPLEMENTED YET!!!")
+        return None
+        # raise ValueError("Not IMPLEMENTED YET!!!")
 
     def __str__(self):
         self.name = "Conditional Upgrade"

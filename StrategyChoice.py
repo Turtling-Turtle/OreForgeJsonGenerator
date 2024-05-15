@@ -9,8 +9,8 @@ from CustomWidgets import JsonSerializable
 from GUI_Ore_Effects import BurningOreEffect, FrostBiteOreEffect, UpgradeOreEffect, BundledOreEffect
 
 
-def bold_string(text_to_bold):
-    return "<b>" + text_to_bold + "</b>"
+def bold_string(textToBold):
+    return "<b>" + textToBold + "</b>"
 
 
 class StrategyChoiceField(QWidget, JsonSerializable):
@@ -31,7 +31,7 @@ class StrategyChoiceField(QWidget, JsonSerializable):
 
         self.layout = QVBoxLayout()
         self.hboxLayout = QVBoxLayout()
-        self.held_strategy = None
+        self.heldStrategy = None
         self.layout.addWidget(self.label)
         self.layout.addWidget(self.menu)
         self.layout.addLayout(self.hboxLayout)
@@ -58,15 +58,15 @@ class StrategyChoiceField(QWidget, JsonSerializable):
         self.clearStrategyWidgets()
         for key, value in self.strategies.items():
             if key.__str__(self) == self.menu.currentText():
-                self.held_strategy = value()
-                self.hboxLayout.addWidget(self.held_strategy)
+                self.heldStrategy = value()
+                self.hboxLayout.addWidget(self.heldStrategy)
                 self.updateAlignment()
 
     def toJson(self):
-        return self.held_strategy.toJson()
+        return self.heldStrategy.toJson()
 
     def isValid(self):
-        return self.held_strategy.isValid()
+        return self.heldStrategy.isValid()
 
     def clear(self):
         pass

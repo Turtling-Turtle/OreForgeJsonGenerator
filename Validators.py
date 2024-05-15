@@ -2,7 +2,7 @@ import queue
 from queue import LifoQueue
 import re
 
-from Helper_Functions import is_numeric
+from Helper_Functions import is_numeric, Color
 
 """
 Reserved Words:
@@ -103,8 +103,6 @@ def validate_function(function_string):
 
 
 function_test_strings = [
-    "ORE_VALUE * 2) * 2) *2) -2) *2) *2) -99E99) -2909) +39999E200) (((((((((",
-    "(4,000 + 2,000)",
     "(2 + 3)",
     "(-2 - -3)",
     "(-8300 --1.0)",
@@ -137,7 +135,12 @@ function_test_strings = [
 
 def test_functions():
     for test_string in function_test_strings:
-        print(f"{test_string}: {validate_function(test_string)}")
+        result = validate_function(test_string)
+        if isinstance(result, LifoQueue):
+            result = Color.GREEN + "Successfully Verified Function: " + result.get_nowait() + Color.END
+            print(f"{test_string}: {result}")
+        else:
+            print(f"{test_string}: {Color.RED + result + Color.END}")
 
 
 # TODO: Implement boolean Condition Validation

@@ -66,12 +66,12 @@ class InputField(QWidget, JsonSerializable):
         elif self.isInteger:
             try:
                 int(self.lineEdit.text())
-                return
+                return None
             except ValueError:
                 return "* Input in " + self.name + " field is not an integer"
         elif self.isFloat:
             if is_numeric(self.lineEdit.text()):
-                return
+                return None
             else:
                 return "* Input in " + self.name + " field is not a valid float"
 
@@ -127,7 +127,7 @@ class DropDownMenu(QWidget, JsonSerializable):
         return None
 
     def isValid(self):
-        return
+        return None
 
     def __str__(self):
         return self.label.text()
