@@ -27,7 +27,7 @@ class InputField(QWidget, JsonSerializable):
     You can specify the accepted input for the field EX: field that only accepts floats etc.
     """
 
-    def __init__(self, LabelName: str, fontSize=14, isInteger=False, isFloat=False, label_tip=None, edit_tip=None):
+    def __init__(self, LabelName: str, fontSize=14, isInteger: bool = False, isFloat: bool = False, label_tip: str = None, edit_tip=None):
         super().__init__()
         self.name = LabelName
         self.hbox = QHBoxLayout()

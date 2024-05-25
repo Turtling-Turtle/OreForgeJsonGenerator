@@ -6,17 +6,7 @@ from PyQt6.QtWidgets import QWidget, QLabel, QVBoxLayout, \
 
 import StrategyChoice
 from CustomWidgets import InputField, DropDownMenu, OptionalField, JsonSerializable, bold_string
-from Validators import validate_function
-
-"""
-Types of Errors:
-    * Field filled out incorrectly(not putting an int or float in a field that only accepts and int or float.)
-    * A required field is left empty.
-    * Syntax error(a function or condition has incorrect syntax/is invalid)
-        * Give more descriptive errors based on the syntax error. 
-    
-    
-"""
+from Validators import validate_function, validate_condition
 
 
 class Color:
@@ -106,7 +96,14 @@ class ConditionalUpgrade(QWidget, JsonSerializable):
         self.name = "Conditional Upgrade"
         self.conditionField = InputField("Condition:")
         self.trueBranch = StrategyChoice.StrategyChoiceField(StrategyChoice.upgradeStrategies, "True Branch")
-        self.falseBranch = StrategyChoice.StrategyChoiceField(StrategyChoice.upgradeStrategies, "False Branch")
+        self.falseBranch = OptionalField(StrategyChoice.StrategyChoiceField(StrategyChoice.upgradeStrategies,
+                                                                            "False Branch"), "False Branch?")
+
+        valid = lambda self: self.customWidget.isValid() if self.checkBox.isChecked else None
+        json = lambda self: self.customWidget.toJson() if self.checkBox.isChecked else None
+        self.falseBranch.setIsValid(lambda: valid(self.falseBranch))
+        self.falseBranch.setToJson(lambda: json(self.falseBranch))
+
         self.layout = QVBoxLayout()
         self.layout.addWidget(self.conditionField)
         self.layout.addWidget(self.trueBranch)
@@ -118,12 +115,24 @@ class ConditionalUpgrade(QWidget, JsonSerializable):
             "upgradeName": "ore.forge.Strategies.UpgradeStrategies.ConditionalUpgrade",
             "condition": self.conditionField.toJson(),
             "trueBranch": self.trueBranch.toJson(),
-            "falseBranch": self.falseBranch.toJson(),
         }
+        if self.falseBranch.checkBox.isChecked():
+            data.update({"falseBranch": self.falseBranch.toJson()})
         return data
 
     def isValid(self):
-        return None
+        results = []
+        results.append(validate_condition(self.conditionField.getFieldData()))
+        if isinstance(self.trueBranch.isValid(), list):
+            results.extend(self.trueBranch.isValid())
+        else:
+            results.append(self.trueBranch.isValid())
+        if self.falseBranch.checkBox.isChecked():
+            if isinstance(self.falseBranch.isValid(), list):
+                results.extend(self.falseBranch.isValid())
+            else:
+                results.append(self.falseBranch.isValid())
+        return results
         # raise ValueError("Not IMPLEMENTED YET!!!")
 
     def __str__(self):
@@ -141,8 +150,8 @@ class InfluencedUpgrade(QWidget, JsonSerializable):
                                          widgetJsonKey="minModifier")
         self.maxModifier = OptionalField(InputField("Maximum Modifier:", isFloat=True), "Set Maximum Modifier?",
                                          widgetJsonKey="maxModifier")
+        self.valueToModify = DropDownMenu(valuesToModify, "Value To Modify:")
 
-        self.validatedFunction = ""
         valid = lambda self: self.customWidget.isValid() if self.checkBox.isChecked() else None
 
         json = lambda self: {self.widgetJsonKey: self.customWidget.toJson()} if self.checkBox.isChecked() else None
@@ -156,15 +165,18 @@ class InfluencedUpgrade(QWidget, JsonSerializable):
         self.layout = QVBoxLayout()
 
         self.layout.addWidget(self.functionField)
+        self.layout.addWidget(self.valueToModify)
         self.layout.addWidget(self.numericOperator)
         self.layout.addWidget(self.minModifier)
         self.layout.addWidget(self.maxModifier)
+
         self.setLayout(self.layout)
 
     def toJson(self):
         data = {
             "upgradeName": "ore.forge.Strategies.UpgradeStrategies.InfluencedUpgrade",
             "upgradeFunction": self.validatedFunction,
+            "valueToModify": self.valueToModify.toJson(),
             "numericOperator": self.numericOperator.toJson(),
         }
         if self.minModifier.toJson() is not None:
@@ -177,7 +189,7 @@ class InfluencedUpgrade(QWidget, JsonSerializable):
     def isValid(self):
         results = [
             validate_function(self.functionField.getFieldData()),
-            self.functionField.isValid(),
+            # self.functionField.isValid(),
             self.minModifier.isValid(),
             self.maxModifier.isValid()
         ]

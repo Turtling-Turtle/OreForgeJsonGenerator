@@ -212,7 +212,11 @@ class ItemCreator(QWidget):
                 result = widget.isValid()
                 if result is not None:
                     if isinstance(result, list):
-                        errorList.extend(result)
+                        errors = []
+                        for element in result:
+                            if element is not None:
+                                errors.append(element)
+                        errorList.extend(errors)
                     elif result:
                         errorList.append(result)
         return errorList

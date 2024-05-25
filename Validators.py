@@ -39,9 +39,10 @@ def has_numeric_char(string):
     return False
 
 
+# TODO: Update to match the parser in Ore Forge.
 # Returns an error message(String) if it fails to validate the function otherwise it returns the LifoQueue that holds the validated function.
 def validate_function(function_string):
-    trimmed_function = function_string.replace(r"(\d+)([-+])(\\d+)", "$1 $2 $3")
+    trimmed_function = function_string.replace(r"(\d+)([-+])(\d+)", "$1 $2 $3")
     open_paren = trimmed_function.count("(")
     close_paren = trimmed_function.count(")")
     if open_paren != close_paren:
@@ -51,7 +52,6 @@ def validate_function(function_string):
     pattern = re.compile(r"([a-zA-Z_]+)|(-?\d*\.?\d+(?:[eE]-?\d+)?)|\(|\)|\+|-|\*|/|=|%|\^")
     operand_stack = LifoQueue()
     operator_stack = LifoQueue()
-    # TODO: Implement Internal state machine for what token type to expect next to allow for better error messages.
 
     tokens = []
     for token in re.finditer(pattern, trimmed_function):
@@ -62,9 +62,6 @@ def validate_function(function_string):
         previous_token = tokens[i - 1] if i > 0 else None
         current_token = tokens[i]
         next_token = tokens[i + 1] if i < len(tokens) - 1 else None
-
-        # if has_numeric_char(current_token):
-        #     current_token.replace(r",", "")
 
         # Correct function so that we don't mistake a subtraction for a negative.
         if previous_token is not None and next_token is not None:
@@ -144,7 +141,7 @@ def test_functions():
 
 
 # TODO: Implement boolean Condition Validation
-def validate_condition(condition_string):
+def validate_condition(condition_string: str):
     pass
 
 

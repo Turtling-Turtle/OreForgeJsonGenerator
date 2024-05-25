@@ -25,7 +25,7 @@ Functions as a "multiplier" for the number of ore.
  
 ### Furnace
 Furnaces are responsible for selling ore. When a furnace goes to sell an ore it applies a bonus/upgrade to the ore. It
-then calculates the ore's sell price by multiplying the ore value by the Multi-Ore, then adds that value to the players wallet.
+then calculates the ore's sell price by multiplying the ore value by the Multi-Ore, then adds that value to the players' wallet.
 After processing a certain number of ore(special point reward threshold)
 the furnace will reward a currency called Special Points which can be used to buy special/unique items in the shop or to
 purchase upgrades. Multi-Ore influences/impacts this process as well. An ore with a multi-ore stat of 2 represents 2 ores
@@ -84,4 +84,12 @@ powerful effect. Tagging an upgradeTag as a resetter tells the game not to reset
 when the ore is reset by an upgrader.
 
 # Ore Effects
+
+- Ore effects function as status effects that can be applied to ore by different items such as upgraders or droppers.
+
+- ***Frostbite and Burning:*** Frostbite a Burning are special because...
+- ***Bundled Effect:*** A Bundled Effect functions similarly to a Bundled Upgrade. It's primary use is to apply multiple
+effects at the same time.
+- ***Upgrade Ore Effect:*** An Upgrade Ore Effect can be configured to apply an upgrade strategy to an ore on a specific
+interval over a set duration. EX: you want an ore's value to increase by 2% every 5 seconds for 30 seconds.
 
