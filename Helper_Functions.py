@@ -106,3 +106,7 @@ def is_numeric(string):
         return True
     except ValueError:
         return False
+
+
+def bold_string(text_to_bold: str):
+    return "<b>" + text_to_bold + "</b>"

@@ -1,4 +1,4 @@
-from Validators.Validator import Validator, ValidationResult
+from GUI.Validators.Validator import Validator, ValidationResult
 
 
 def isFloat(value: str):
@@ -23,9 +23,11 @@ class NumberValidator(Validator):
     It can compare it against a minimum and maximum value.
 
     """
+
     def __init__(self, parentFieldName: str, numberType: type, min_value=None, max_value=None):
         super().__init__(parentFieldName)
-        assert numberType == float or numberType == int
+        if numberType not in (float, int):
+            raise TypeError("Unsupported type for input data: " + str(numberType) + ", expected float or int.")
         self.numberType = numberType
         self.minimumValue = min_value
         self.maximumValue = max_value
@@ -35,7 +37,8 @@ class NumberValidator(Validator):
             if isFloat(inputData):
                 return self.compareRange(float(inputData))
             else:
-                return ValidationResult("Inputted value in " + self.fieldName + " field is not a valid floating point number.")
+                return ValidationResult(
+                    "Inputted value in " + self.fieldName + " field is not a valid floating point number.")
 
         if self.numberType == int:
             if isInteger(inputData):

@@ -15,6 +15,25 @@
 Make a validator class which takes an input and validates it.
 All Widgets will have a validator when created.
 
+Item Creator Tab will have a list of all widgets.
+    When generate item is clicked -> {
+        iterate through all widgets in list.
+        If Widget is of type JsonSerializable, get ValidationResult from it.
+
+        iterate through all ValidationResults and extract all errorMessages from them.
+
+        if No error messages in all the results proceed to the JSON Conversion Step.
+
+        JSON Conversion step -> {
+            Each Widget will have a method that allows it to convert its data into a dictionary.
+
+            iterate through all widgets and call their toJSON function if they are of type JsonSerializable
+            update(add) the result to the existing dict.
+        }
+
+
+    }
+
 Everything Else:
     requires:
     rarity: NA

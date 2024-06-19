@@ -2,11 +2,11 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont
 from PyQt6.QtWidgets import QComboBox, QLabel, QWidget, QVBoxLayout, QPushButton
 
-from GUI_Upgrade_Strategies import BasicUpgrade, BundledUpgrade, ConditionalUpgrade, InfluencedUpgrade, \
-    ResetterUpgrade, ApplyEffect, DestroyOre, CooldownUpgrade, IncrementalUpgrade
-from CustomWidgets import JsonSerializable
+from UpgradeStrategies import BasicUpgrade, BundledUpgrade, ConditionalUpgrade, InfluencedUpgrade, \
+    ResetterUpgrade, ApplyEffect, DestroyOre
+from Widgets import JsonSerializable
 
-from GUI_Ore_Effects import BurningOreEffect, FrostBiteOreEffect, UpgradeOreEffect, BundledOreEffect
+from OreEffects import BurningOreEffect, FrostBiteOreEffect, UpgradeOreEffect, BundledOreEffect
 
 
 def bold_string(textToBold):

@@ -10,8 +10,8 @@ import StrategyChoice
 from StrategyChoice import upgradeStrategies
 from CLI.Item_Constructors import generate_item_id
 from StrategyChoice import StrategyChoiceField
-from GUI_Upgrade_Strategies import Color
-from CustomWidgets import InputField, DropDownMenu, OptInField, JsonSerializable, BooleanField
+from UpgradeStrategies import Color
+from GUI.Widgets import InputField, DropDownMenu, OptInField, JsonSerializable, BooleanField
 
 # Tiers
 pinnacle = (Color.RED + "Pinnacle" + Color.END + "-TEMP DESCRIPTION- THE RAREST", "PINNACLE")

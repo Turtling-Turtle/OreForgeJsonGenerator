@@ -1,8 +1,8 @@
 from PyQt6.QtWidgets import QWidget, QVBoxLayout
 
-import CustomWidgets
+from GUI import CustomWidgets
 import StrategyChoice
-from CustomWidgets import JsonSerializable
+from GUI.Widgets import JsonSerializable
 
 
 class BundledOreEffect(QWidget, JsonSerializable):

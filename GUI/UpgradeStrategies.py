@@ -5,8 +5,8 @@ from PyQt6.QtWidgets import QWidget, QLabel, QVBoxLayout, \
     QHBoxLayout
 
 import StrategyChoice
-from CustomWidgets import InputField, DropDownMenu, OptInField, JsonSerializable, bold_string
-from Validators import validate_function, validate_condition
+from GUI.Widgets import InputField, DropDownMenu, OptInField, JsonSerializable, bold_string
+from Validators.ExpressionValidators import validate_function, validate_condition
 
 
 class Color:
