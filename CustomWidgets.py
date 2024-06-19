@@ -16,6 +16,7 @@ class JsonSerializable:
     :returns str  if the data is invalid
     :returns list[str] if the widget has multiple fields data is invalid
     """
+
     def isValid(self):
         raise NotImplemented()
 
@@ -27,8 +28,11 @@ class InputField(QWidget, JsonSerializable):
     You can specify the accepted input for the field EX: field that only accepts floats etc.
     """
 
-    def __init__(self, LabelName: str, fontSize=14, isInteger: bool = False, isFloat: bool = False, label_tip: str = None, edit_tip=None):
+    def __init__(self, LabelName: str, fontSize=14, isInteger: bool = False, isFloat: bool = False,
+                 label_tip: str = None, edit_tip=None, maxValue: float = None, minValue: float = None):
         super().__init__()
+        self.maxValue = maxValue
+        self.minValue = minValue
         self.name = LabelName
         self.hbox = QHBoxLayout()
         self.isInteger = isInteger
@@ -65,14 +69,23 @@ class InputField(QWidget, JsonSerializable):
             return "*" + self.name + " is empty"
         elif self.isInteger:
             try:
-                int(self.lineEdit.text())
+                value = int(self.lineEdit.text())
+                if self.maxValue is not None and value > self.maxValue:
+                    return "*" + self.name + " exceeds the max value of " + str(self.maxValue)
+                if self.minValue is not None and value < self.minValue:
+                    return "*" + self.name + " is less than the min value of " + str(self.minValue)
                 return None
             except ValueError:
                 return "* Input in " + self.name + " field is not an integer"
         elif self.isFloat:
-            if is_numeric(self.lineEdit.text()):
+            try:
+                value = float(self.lineEdit.text())
+                if self.maxValue is not None and value > self.maxValue:
+                    return "*" + self.name + " exceeds the max value of " + str(self.maxValue)
+                if self.maxValue is not None and value < self.minValue:
+                    return "*" + self.name + " is less than the min value of " + str(self.minValue)
                 return None
-            else:
+            except ValueError:
                 return "* Input in " + self.name + " field is not a valid float"
 
     def __str__(self):
@@ -133,8 +146,7 @@ class DropDownMenu(QWidget, JsonSerializable):
         return self.label.text()
 
 
-class OptionalField(QWidget, JsonSerializable):
-
+class OptInField(QWidget, JsonSerializable):
     """
     An optional field takes another QWidget that "implements" JsonSerializable.
 
@@ -194,3 +206,20 @@ class OptionalField(QWidget, JsonSerializable):
 
 def bold_string(text_to_bold):
     return "<b>" + text_to_bold + "</b>"
+
+
+class BooleanField(QWidget, JsonSerializable):
+
+    def __init__(self, checkBoxPrompt: str, booleanJsonKey: str):
+        super().__init__()
+        self.layout = QHBoxLayout()
+        self.checkBox = QCheckBox(checkBoxPrompt)
+        self.layout.addWidget(self.checkBox)
+        self.setLayout(self.layout)
+        self.booleanJsonKey = booleanJsonKey
+
+    def toJson(self):
+        return {self.booleanJsonKey: self.checkBox.isChecked()}
+
+    def isValid(self):
+        return None

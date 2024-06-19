@@ -4,14 +4,14 @@ import sys
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont
 from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QComboBox, QVBoxLayout, \
-    QHBoxLayout, QPushButton, QMessageBox, QCheckBox
+    QHBoxLayout, QPushButton, QMessageBox, QCheckBox, QScrollArea
 
 import StrategyChoice
 from StrategyChoice import upgradeStrategies
 from CLI.Item_Constructors import generate_item_id
 from StrategyChoice import StrategyChoiceField
 from GUI_Upgrade_Strategies import Color
-from CustomWidgets import InputField, DropDownMenu, OptionalField, JsonSerializable
+from CustomWidgets import InputField, DropDownMenu, OptInField, JsonSerializable, BooleanField
 
 # Tiers
 pinnacle = (Color.RED + "Pinnacle" + Color.END + "-TEMP DESCRIPTION- THE RAREST", "PINNACLE")
@@ -24,6 +24,18 @@ rare = (Color.BLUE + "Rare" + Color.END + " - TEMP DESCRIPTION - 7th RAREST", "R
 uncommon = (Color.GREEN + "Uncommon" + Color.END + "- TEMP DESCRIPTION - 8th RAREST", "UNCOMMON")
 common = ("Common - TEMP DESCRIPTION - 9th RAREST", "COMMON")
 tiers = [pinnacle, special, exotic, prestige, epic, superRare, rare, uncommon, common]
+
+# Currency
+cash = "Cash", "CASH"
+specialPoints = "Special Points", "SPECIAL_POINTS"
+prestigeCurrency = "Prestige Currency", "PRESTIGE_POINTS"
+none = "None", "NONE"
+currency = [cash, specialPoints, prestigeCurrency, none]
+
+# Unlock Method
+prestigeLevel = "Prestige Level", "PRESTIGE_LEVEL"
+quest = "Quest", "QUEST"
+unlockMethods = [prestigeLevel, specialPoints, quest, none]
 
 
 # @author Nathan Ulmen
@@ -45,8 +57,12 @@ class ItemCreator(QWidget):
         self.initUI()
 
     def initUI(self):
+        self.scrollArea = QScrollArea()
+        self.ultimateLayout = QVBoxLayout()
+        self.ultimateLayout.addWidget(self.scrollArea)
         self.layout = QVBoxLayout()
-        self.setLayout(self.layout)
+        self.setLayout(self.ultimateLayout)
+        self.scrollArea.setLayout(self.layout)
 
         self.essentials_hbox = QHBoxLayout()
         self.generate_button = QPushButton("Generate Item")
@@ -76,7 +92,7 @@ class ItemCreator(QWidget):
         self.createCommonUI()
 
         self.generate_button.clicked.connect(
-            lambda: self.printJsonData())  #https://stackoverflow.com/questions/40982518/argument-1-has-unexpected-type-nonetype
+            lambda: self.printJsonData())  # https://stackoverflow.com/questions/40982518/argument-1-has-unexpected-type-nonetype
         self.onItemTypeChange()
         self.show()
 
@@ -118,7 +134,7 @@ class ItemCreator(QWidget):
         self.tier = DropDownMenu(tiers, "Tier:", label_tip="The Tier of the Item", box_tip="The Tier of the Item")
         self.layout.addWidget(self.tier)
 
-        self.shopItemField = OptionalField(InputField("Item Price", isInteger=True), "Shop Item?", "isShopItem",
+        self.shopItemField = OptInField(InputField("Item Price", isInteger=True), "Shop Item?", "isShopItem",
                                            "itemValue")
         to_json_implmentation = lambda self: {
             self.booleanJsonKey: self.checkBox.isChecked(),
@@ -131,6 +147,29 @@ class ItemCreator(QWidget):
         self.shopItemField.setIsValid(lambda: isValidImplementation(self.shopItemField))
 
         self.layout.addWidget(self.shopItemField)
+
+        self.isPrestigeProof = BooleanField("Prestige Proof", "isPrestigeProof");
+        self.layout.addWidget(self.isPrestigeProof)
+
+        self.rarity = InputField("Rarity:", label_tip="Rarity of the Item", edit_tip="Rarity of the Item", isFloat=True,
+                                 maxValue=100, minValue=0.01)
+        self.layout.addWidget(self.rarity)
+
+        self.currencyType = DropDownMenu(currency, "Currency Bought With", label_tip="Currency the Item is bought with",
+                                         box_tip="Currency the Item is bought with")
+        self.layout.addWidget(self.currencyType)
+
+        self.unlockMethod = DropDownMenu(unlockMethods, "Unlock Method")
+        self.layout.addWidget(self.unlockMethod)
+
+        self.unlockRequirements = InputField("Unlock Requirements", isInteger=True)
+        self.layout.addWidget(self.unlockRequirements)
+
+        self.canBeSold = OptInField(InputField("Sell Price", isInteger=True), "Can be Sold", "canBeSold",
+                                       "sellPrice")
+        self.canBeSold.setIsValid(lambda: isValidImplementation(self.canBeSold))
+        self.canBeSold.setToJson(lambda: to_json_implmentation(self.canBeSold))
+        self.layout.addWidget(self.canBeSold)
 
         self.layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
 
@@ -165,7 +204,7 @@ class ItemCreator(QWidget):
         self.dropInterval.set_both_tips("The interval in seconds in which the dropper produces a new Ore")
 
         self.strategies = StrategyChoiceField(StrategyChoice.oreEffects, "Ore Effect")
-        self.dropperStrategy = OptionalField(self.strategies, "Ore Effect")
+        self.dropperStrategy = OptInField(self.strategies, "Ore Effect")
 
         json_behavior = lambda self: self.customWidget.toJson() if self.checkBox.isChecked() else None
         self.dropperStrategy.setToJson(lambda: json_behavior(self.dropperStrategy))
@@ -234,6 +273,14 @@ class ItemCreator(QWidget):
                 #             self.shop_checkbox.isChecked() and self.price_field is not None) else 0
             }
             item_data.update(self.shopItemField.toJson())
+            item_data.update({"rarity": self.rarity.toJson()})
+            item_data.update(self.isPrestigeProof.toJson())
+
+            item_data.update({"currencyBoughtWith": self.currencyType.toJson()})
+            item_data.update({"unlockMethod": self.unlockMethod.toJson()})
+            item_data.update({"unlockRequirements": self.unlockRequirements.toJson()})
+            item_data.update(self.canBeSold.toJson())
+
             item_data.update(self.getItemSpecificData())
             return item_data
         else:
@@ -242,6 +289,7 @@ class ItemCreator(QWidget):
             error_box.setIcon(QMessageBox.Icon.Critical)
             error_text = "Data validation failed."
             for error in errorList:
+                print()
                 error_text += "\n" + error
             error_box.setText(error_text)
             error_box.exec()

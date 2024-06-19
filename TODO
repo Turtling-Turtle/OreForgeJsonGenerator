@@ -1,0 +1,71 @@
+1A. Add fields for Item Acquisition Info
+
+2.A Update verification for Functions.
+    * No longer requires everything to be wrapped in parenthesis.
+    * Include implied multiply.
+    * Include log, ln, and sqrt.
+
+3.A Add verification for Conditions.
+
+
+4. Maybe graph the function that they made?
+
+
+5. Refine/refactor this program, its a mess.
+Make a validator class which takes an input and validates it.
+All Widgets will have a validator when created.
+
+Everything Else:
+    requires:
+    rarity: NA
+    unlockMethod: (ENUM) NONE || QUEST
+    unlockRequirements: NONE || NA
+    currency: (ENUM) CASH
+    canBeSold: true
+    itemPrice: (double)
+    sellPrice: (double)
+    isPrestigeProof: (boolean) false
+
+Special:
+    requires:
+    rarity: NA
+    unlockMethod: (ENUM) NONE || SPECIAL_POINTS || PRESTIGE_LEVEL || CASH_THRESHOLD || QUEST
+    unlockRequirements: NONE || (double) || NA
+    currency: (ENUM) SPECIAL_POINTS
+    canBeSold: (boolean) true
+    itemPrice: (double)
+    sellPrice: (double)
+    isPrestigeProof: (boolean) true
+
+Prestige
+    require:
+    rarity: 0.1 -> 100.0
+    unlockMethod: (ENUM) PRESTIGE_LEVEL || QUEST
+    unlockRequirements: (double) Level Required to enter pool || NA ||
+    currency: (ENUM) Currency item is bought and sold with
+    canBeSold: (boolean) true
+    itemPrice: (double) amount bought for
+    sellPrice: (double) amount sold for
+    isPrestigeProof: (boolean) true
+
+Exotic ---Items that are unlocked for purchase with special points once a quest is completed---
+    requires:
+    rarity: NA
+    unlockMethod: (ENUM) Quest
+    unlockRequirements: NA
+    currency: (ENUM) SPECIAL_POINTS
+    canBeSold: false
+    itemPrice: (double) amount bought for
+    sellPrice: (double) amount sold for
+    isPrestigeProof: (boolean) true
+
+PINNACLE ---One of a kind items that are only obtained once as a direct reward from a quest---
+    requires:
+    rarity: NA
+    unlockMethod: (ENUM) QUEST
+    unlockRequirements: NA
+    currency: NA
+    canBeSold: false
+    itemPrice: NA
+    sellPrice: NA
+    isPrestigeProof: (boolean) true

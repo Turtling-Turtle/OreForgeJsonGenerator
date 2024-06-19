@@ -5,7 +5,7 @@ from PyQt6.QtWidgets import QWidget, QLabel, QVBoxLayout, \
     QHBoxLayout
 
 import StrategyChoice
-from CustomWidgets import InputField, DropDownMenu, OptionalField, JsonSerializable, bold_string
+from CustomWidgets import InputField, DropDownMenu, OptInField, JsonSerializable, bold_string
 from Validators import validate_function, validate_condition
 
 
@@ -96,7 +96,7 @@ class ConditionalUpgrade(QWidget, JsonSerializable):
         self.name = "Conditional Upgrade"
         self.conditionField = InputField("Condition:")
         self.trueBranch = StrategyChoice.StrategyChoiceField(StrategyChoice.upgradeStrategies, "True Branch")
-        self.falseBranch = OptionalField(StrategyChoice.StrategyChoiceField(StrategyChoice.upgradeStrategies,
+        self.falseBranch = OptInField(StrategyChoice.StrategyChoiceField(StrategyChoice.upgradeStrategies,
                                                                             "False Branch"), "False Branch?")
 
         valid = lambda self: self.customWidget.isValid() if self.checkBox.isChecked else None
@@ -146,10 +146,10 @@ class InfluencedUpgrade(QWidget, JsonSerializable):
         self.name = "Influenced Upgrade"
         self.functionField = InputField("Custom Function:")
         self.numericOperator = DropDownMenu(numericOperators, "Operator:")
-        self.minModifier = OptionalField(InputField("Minimum Modifier", isFloat=True), "Set Minimum Modifier?",
-                                         widgetJsonKey="minModifier")
-        self.maxModifier = OptionalField(InputField("Maximum Modifier:", isFloat=True), "Set Maximum Modifier?",
-                                         widgetJsonKey="maxModifier")
+        self.minModifier = OptInField(InputField("Minimum Modifier", isFloat=True), "Set Minimum Modifier?",
+                                      widgetJsonKey="minModifier")
+        self.maxModifier = OptInField(InputField("Maximum Modifier:", isFloat=True), "Set Maximum Modifier?",
+                                      widgetJsonKey="maxModifier")
         self.valueToModify = DropDownMenu(valuesToModify, "Value To Modify:")
 
         valid = lambda self: self.customWidget.isValid() if self.checkBox.isChecked() else None
