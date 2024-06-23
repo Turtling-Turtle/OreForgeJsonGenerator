@@ -2,17 +2,15 @@ from abc import ABC, abstractmethod
 
 
 class ValidationResult:
-    """
-    """
 
     def __init__(self, errorMessage: str = None):
-        self.hasError = errorMessage is not None
+        self.isError = errorMessage is not None
         self.errorMessage = errorMessage
 
-    def isError(self) -> bool:
-        return self.hasError
+    def hasError(self) -> bool:
+        return self.isError
 
-    def errorMessage(self) -> str:
+    def getErrorMessage(self) -> str:
         return self.errorMessage
 
 

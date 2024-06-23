@@ -3,16 +3,16 @@ from typing import Union
 from PyQt6.QtGui import QFont
 from PyQt6.QtWidgets import QWidget, QCheckBox, QLabel
 
-from GUI.JsonSerializable import JsonSerializable
+from GUI.JsonSerializable import JsonSerializable, CustomWidget
 from GUI.Validators.Validator import ValidationResult, Validator
 from Helper_Functions import bold_string
 
 
-class OptInWidgetField(QWidget, JsonSerializable):
+class OptInWidgetField(QWidget, JsonSerializable, CustomWidget):
 
-    def __init__(self, fieldName, validator: Validator, keyName: str, customWidget: QWidget):
-        super().__init__(fieldName, validator, keyName)
-        if not isinstance(customWidget, (JsonSerializable, QWidget)):
+    def __init__(self, fieldName, keyName: str, customWidget: QWidget):
+        super().__init__(fieldName, keyName)
+        if not isinstance(customWidget, (JsonSerializable, QWidget, CustomWidget)):
             raise TypeError("customWidget must be of type JsonSerializable, is of type" + str(type(customWidget)))
 
         self.customWidget = customWidget
@@ -28,6 +28,7 @@ class OptInWidgetField(QWidget, JsonSerializable):
     Potential Solution: Change/make sure that game only tries to load the following field if the it was opted into. 
     EX: if canBeSold is true try to get sellPrice otherwise otherwise sellPrice is just set to 0 as a default value cause it cant be sold.
     """
+
     def toDict(self) -> dict:
         results = {self.keyName: self.checkBox.isChecked()}
         if self.checkBox.isChecked():

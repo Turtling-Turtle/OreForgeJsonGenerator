@@ -24,8 +24,9 @@ class NumberValidator(Validator):
 
     """
 
-    def __init__(self, parentFieldName: str, numberType: type, min_value=None, max_value=None):
-        super().__init__(parentFieldName)
+    def __init__(self, numberType: type, min_value=None, max_value=None):
+        super().__init__()
+        # self.setParentFieldName(parentFieldName)
         if numberType not in (float, int):
             raise TypeError("Unsupported type for input data: " + str(numberType) + ", expected float or int.")
         self.numberType = numberType

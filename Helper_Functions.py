@@ -104,7 +104,7 @@ def is_numeric(string):
     try:
         float(string)
         return True
-    except ValueError:
+    except Exception:
         return False
 
 

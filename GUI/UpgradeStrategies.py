@@ -58,7 +58,7 @@ class BasicUpgrade(QWidget, JsonSerializable):
         data = {
             "upgradeName": "ore.forge.Strategies.UpgradeStrategies.BasicUpgrade",
             "valueToModify": self.vtm.toJson(),
-            "operation": self.operation.toJson(),
+            "operator": self.operation.toJson(),
             "modifier": self.modifier.toJson(),
         }
         return data
@@ -177,7 +177,7 @@ class InfluencedUpgrade(QWidget, JsonSerializable):
             "upgradeName": "ore.forge.Strategies.UpgradeStrategies.InfluencedUpgrade",
             "upgradeFunction": self.validatedFunction,
             "valueToModify": self.valueToModify.toJson(),
-            "numericOperator": self.numericOperator.toJson(),
+            "operator": self.numericOperator.toJson(),
         }
         if self.minModifier.toJson() is not None:
             data.update(self.minModifier.toJson())
