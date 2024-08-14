@@ -6,9 +6,11 @@ from PyQt6.QtWidgets import QWidget, QVBoxLayout, QMessageBox, QApplication, QSc
 
 from GUI.AcquisitionInfo import AcquisitionInfo
 from GUI.CustomWidgets.DropDownMenu import DropDownMenu
+from GUI.ItemSpecificWidgets.UpgraderWidget import UpgraderWidget
 from GUI.JsonSerializable import JsonSerializable
-from GUI.StrategyWidgets.BasicUpgradeWidget import BasicUpgradeWidget
-from GUI.StrategyWidgets.InfluencedUpgradeWidget import InfluencedUpgradeWidget
+from GUI.UpgradeStrategyWidgets import Constants
+from GUI.UpgradeStrategyWidgets.Constants import returnUpgradeStrategies
+from GUI.UpgradeStrategyWidgets.StrategyChoiceField import StrategyChoiceField
 from GUI.UniversalAttributes import UniversalAttributes
 from GUI.Validators.Validator import ValidationResult
 
@@ -29,6 +31,7 @@ class ItemCreator(QWidget):
         self.mainLayout = QVBoxLayout(self)
 
         self.itemType = DropDownMenu("Item Type", "itemType", itemTypes)
+        self.itemType.dropDown.currentTextChanged.connect(self.updateItemSpecificInfo)
         self.mainLayout.addWidget(self.itemType, alignment=Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
 
         self.mainLayout.addWidget(self.scrollBox)
@@ -41,7 +44,11 @@ class ItemCreator(QWidget):
 
         self.addJsonWidget(AcquisitionInfo())
 
-        self.addJsonWidget(InfluencedUpgradeWidget())
+        # self.addJsonWidget(
+        #     StrategyChoiceField(returnUpgradeStrategies()))
+
+        self.itemSpecificInfo = UpgraderWidget("Test", "test")
+        self.addJsonWidget(self.itemSpecificInfo)
 
         self.scrollBox.setWidget(self.contentWidget)
 
@@ -54,11 +61,19 @@ class ItemCreator(QWidget):
 
     def updateItemSpecificInfo(self) -> None:
         pass
+        # self.removeJsonWidget(self.itemSpecificInfo)
+        # if self.itemType.dropDown.currentText() == "Upgrader":
+        #     self.itemSpecificInfo = UpgraderWidget("Test", "test")
+        #     self.addJsonWidget(self.itemSpecificInfo)
 
     def addJsonWidget(self, jsonWidget: JsonSerializable):
         # self.contentLayout.addWidget(jsonWidget, alignment=Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
         self.contentLayout.addWidget(jsonWidget)
         self.jsonWidgets.append(jsonWidget)
+
+    def removeJsonWidget(self, target: JsonSerializable):
+        self.contentLayout.removeWidget(target)
+        self.jsonWidgets.remove(target)
 
     def generateItem(self) -> None:
         validationResults = self.validateFields()
@@ -66,7 +81,7 @@ class ItemCreator(QWidget):
         if len(errorList) > 0:
             self.postError(errorList)
         else:
-            print(json.dumps(self.getJSON(), indent=4))
+            print(json.dumps(self.getJSON(), indent=2))
 
     def getJSON(self) -> dict:
         data = {}

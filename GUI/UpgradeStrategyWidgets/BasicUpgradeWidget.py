@@ -1,12 +1,10 @@
 from typing import Union
 
-from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QWidget, QHBoxLayout, QGridLayout
+from PyQt6.QtWidgets import QVBoxLayout
 
-from GUI.CustomWidgets.DropDownMenu import DropDownMenu
 from GUI.CustomWidgets.InputField import InputField
 from GUI.JsonSerializable import JsonSerializable
-from GUI.StrategyWidgets.StrategyWidget import StrategyWidget, createVTMWidget, createOperatorWidget
+from GUI.UpgradeStrategyWidgets.StrategyWidget import StrategyWidget, createVTMWidget, createOperatorWidget
 from GUI.Validators.NumberValidator import NumberValidator
 from GUI.Validators.Validator import ValidationResult
 
@@ -15,9 +13,10 @@ from GUI.Validators.Validator import ValidationResult
 
 
 class BasicUpgradeWidget(StrategyWidget, JsonSerializable):
-    def __init__(self, parent=None):
-        super().__init__("Basic Upgrade")
-
+    def __init__(self, dropdownMenu, parent: object = None):
+        super().__init__(dropdownMenu, "Basic Upgrade", QVBoxLayout(), parent=parent)
+        self.addWidget(self.nameLabel)
+        self.addWidget(self.strategyChoice)
         self.addJsonWidget(createVTMWidget())
         self.addJsonWidget(createOperatorWidget())
         self.addJsonWidget(InputField("Modifier", NumberValidator(float), "modifier", float))

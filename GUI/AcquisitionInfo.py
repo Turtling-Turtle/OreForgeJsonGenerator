@@ -136,8 +136,9 @@ class BaseConfig(QWidget, JsonSerializable):
 class PinnacleTierConfig(BaseConfig):
     def __init__(self):
         super().__init__()
+        self.rarityField.validator = NumberValidator(float, min_value=-100, max_value=100)
         self.rarityField.setVisible(False)
-        self.rarityField.lineEdit.setText("1")
+        self.rarityField.lineEdit.setText("-1")
 
         self.unlockMethod.updateContent([quest])
         self.unlockMethod.setDisabled(True)
@@ -161,8 +162,9 @@ class PinnacleTierConfig(BaseConfig):
 class ExoticTierConfig(BaseConfig):
     def __init__(self):
         super().__init__()
+        self.rarityField.validator = NumberValidator(float, min_value=-100, max_value=100)
         self.rarityField.setVisible(False)
-        self.rarityField.lineEdit.setText("1")
+        self.rarityField.lineEdit.setText("-1")
 
         self.unlockMethod.updateContent([quest])
         self.unlockMethod.setDisabled(True)
@@ -213,7 +215,8 @@ class SpecialTierConfig(BaseConfig):
     def __init__(self):
         super().__init__()
         self.rarityField.setVisible(False)
-        self.rarityField.lineEdit.setText("1")
+        self.rarityField.validator = NumberValidator(float, min_value=-100, max_value=100)
+        self.rarityField.lineEdit.setText("-1")
 
         self.unlockMethod.updateContent(unlockMethods)
         self.unlockMethod.dropDown.currentTextChanged.connect(self.updateUnlockRequirement)
@@ -241,7 +244,8 @@ class DefaultTierConfig(BaseConfig):
     def __init__(self):
         super().__init__()
         self.rarityField.setVisible(False)
-        self.rarityField.lineEdit.setText("1")
+        self.rarityField.validator = NumberValidator(float, min_value=-100, max_value=100)
+        self.rarityField.lineEdit.setText("-1")
 
         self.unlockMethod.updateContent([none, quest])
 
@@ -249,4 +253,3 @@ class DefaultTierConfig(BaseConfig):
         self.currency.setDisabled(True)
 
         self.isPrestigeProof.checkBox.setChecked(False)
-

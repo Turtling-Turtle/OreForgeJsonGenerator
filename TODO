@@ -1,38 +1,22 @@
-1A. Add fields for Item Acquisition Info
+Overall Goals for Ore Forge Content Manager:
 
-2.A Update verification for Functions.
-    * No longer requires everything to be wrapped in parenthesis.
-    * Include implied multiply.
-    * Include log, ln, and sqrt.
+1. Allow the user to create and add items and achievements to the game. Players will also be able to edit content in their game and remove it.
 
-3.A Add verification for Conditions.
+2. An "online" content browser where you can browse other items and achievements/quests that players have created.
 
+3. Syntax highlighting for specific fields.(Boolean Expressions, Functions, Quests etc.)
 
-4. Maybe graph the function that they made?
+4. An In Depth Dictionary page about the game and how it functions.
 
+5. Feedback and app analytics?
 
-5. Refine/refactor this program, its a mess.
-Make a validator class which takes an input and validates it.
-All Widgets will have a validator when created.
-
-Item Creator Tab will have a list of all widgets.
-    When generate item is clicked -> {
-        iterate through all widgets in list.
-        If Widget is of type JsonSerializable, get ValidationResult from it.
-
-        iterate through all ValidationResults and extract all errorMessages from them.
-
-        if No error messages in all the results proceed to the JSON Conversion Step.
-
-        JSON Conversion step -> {
-            Each Widget will have a method that allows it to convert its data into a dictionary.
-
-            iterate through all widgets and call their toJSON function if they are of type JsonSerializable
-            update(add) the result to the existing dict.
-        }
+6. Expression Analyzer that analyzes conditions to determine if they are valid/will function.
 
 
-    }
+
+
+
+
 
 Everything Else:
     requires:
@@ -88,7 +72,6 @@ PINNACLE ---One of a kind items that are only obtained once as a direct reward f
     itemPrice: NA
     sellPrice: NA
     isPrestigeProof: (boolean) true
-
 
 
 

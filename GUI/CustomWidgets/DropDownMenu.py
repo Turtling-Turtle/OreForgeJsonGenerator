@@ -8,6 +8,8 @@ from GUI.JsonSerializable import JsonSerializable, CustomWidget
 from GUI.Validators.Validator import ValidationResult, Validator
 from Helper_Functions import bold_string
 
+def ignore(pos):
+    pass
 
 class DropDownMenu(QWidget, JsonSerializable, CustomWidget):
     """
@@ -28,6 +30,7 @@ class DropDownMenu(QWidget, JsonSerializable, CustomWidget):
 
         self.dropDown = QComboBox()
         self.options = content
+        self.dropDown.wheelEvent = ignore
         for element in self.options:
             self.dropDown.addItem(element[0])
 
@@ -56,4 +59,9 @@ class DropDownMenu(QWidget, JsonSerializable, CustomWidget):
 
     def setDropDownToolTip(self, toolTip: str):
         self.dropDown.setToolTip(toolTip)
+        return self
+
+    def setBothToolTip(self, toolTip: str):
+        self.dropDown.setToolTip(toolTip)
+        self.label.setToolTip(toolTip)
         return self

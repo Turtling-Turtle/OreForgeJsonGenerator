@@ -21,12 +21,16 @@ string_ore_fields = ["NAME", "ID", "TYPE"]
 other_fields = ["ACTIVE_ORE", "PLACED_ITEMS", "SPECIAL_POINTS", "WALLET", "PRESTIGE_LEVEL", "PRESTIGE_LEVEL"]
 logical_operators = ["NOT", "XOR", "AND", "OR"]
 numeric_operators = ["+", "-", "*", "/", "=", "%", "^"]
-special_functions = ["log(", "sqrt(", "ln("]
+special_functions = ["log(", "sqrt(", "ln(", "abs("]
 
 
-def is_negative(string):
-    digit = re.search(r'(-?\d*\.?\d+(?:[eE]-?\d+)?)', string)
-    return digit is not None and digit.group() is not None
+def is_negative(string:str) -> bool:
+    if is_numeric(string):
+        value = float(string)
+        if value < 0:
+            return True
+    # digit = re.search(r'(-?\d*\.?\d+(?:[eE]-?\d+)?)', string)
+    # return digit is not None and digit.group() is not None
 
 
 def is_operand(string):
@@ -53,7 +57,9 @@ def getSpecialFunction(string: str) -> str:
 def create_Function(operandStack: LifoQueue, operatorStack: LifoQueue, wrapInParen: bool = None) -> str:
     try:
         right = operandStack.get_nowait()
+        # print(right)
         left = operandStack.get_nowait()
+        # print(left)
         operator = operatorStack.get_nowait()
         # operandStack.put(f"{left} {operator} {right}")
         return f"{left} {operator} {right}"
@@ -61,7 +67,7 @@ def create_Function(operandStack: LifoQueue, operatorStack: LifoQueue, wrapInPar
         raise ValueError("Operator stack is empty")
 
 
-# TODO: Update to match the parser in Ore Forge.
+# TODO: Update to hand scenario: -(32+2) -> -1*(32+2) ??
 # Returns an error message(String) if it fails to validate the function otherwise it returns the LifoQueue that holds the validated function.
 def validate_function(function_string):
     trimmed_function = function_string.replace(r"(\d+)([-+])(\d+)", "$1 $2 $3")
@@ -79,7 +85,7 @@ def validate_function(function_string):
 
     # pattern = re.compile(r"([a-zA-Z_]+)|(-?\d*\.?\d+(?:[eE]-?\d+)?)|\(|\)|\+|-|\*|/|=|%|\^")
     pattern = re.compile(
-        "(log\\(|sqrt\\(|ln\\()((?:[^)(]|\\((?:[^)(]|\\((?:[^)(]|\\([^)(]*\\))*\\))*\\))*)|([a-zA-Z_]+)|(-?\\d*\\.?\\d+(?:[eE][-+]?\\d+)?)|\\(|\\)|([+\\-*/^=%])");
+        "(log\\(|sqrt\\(|ln\\(|abs\\()((?:[^)(]|\\((?:[^)(]|\\((?:[^)(]|\\([^)(]*\\))*\\))*\\))*)|([a-zA-Z_]+)|(-?\\d*\\.?\\d+(?:[eE][-+]?\\d+)?)|\\(|\\)|([+\\-*/^=%])");
 
     operand_stack = LifoQueue()
     operator_stack = LifoQueue()
@@ -94,7 +100,6 @@ def validate_function(function_string):
         if skip:
             skip = False
             continue
-        print(i)
         previous_token = tokens[i - 1] if i > 0 else None
         current_Token = tokens[i]
         next_token = tokens[i + 1] if i < len(tokens) - 1 else None
@@ -102,9 +107,7 @@ def validate_function(function_string):
 
         # Correct function so that we don't mistake a subtraction for a negative.
         # if previous_token is not None and next_token is not None:
-        if (previous_token is not None and is_operand(
-                previous_token.group()) or previous_token and previous_token.group() == ")") and (
-                next_token and next_token.group() == ")") and is_negative(tokenString):
+        if (previous_token and is_operand(previous_token.group()) or previous_token and previous_token.group() == ")") and (next_token and next_token.group() == ")") and is_negative(tokenString):
             operator_stack.put("- ")
             operand_stack.put(tokenString.replace("-", ""))
             operand_count += 1
@@ -125,8 +128,7 @@ def validate_function(function_string):
             operator_stack.get_nowait()  # Remove "(" character
             operator_stack.put("*")
             continue
-        elif is_operand(tokenString) and (
-                next_token and next_token.group() == "("):  # Scenario: 30(30+42) -> 30 * (30+42)
+        elif is_operand(tokenString) and ((next_token and next_token.group()) == "(" or (next_token and isSpecialFunction(next_token.group()))):  # Scenario: 30(30+42) -> 30 * (30+42)
             operand_stack.put(tokenString)
             operator_stack.put("*")
             operand_count += 1
@@ -164,7 +166,6 @@ def validate_function(function_string):
             result = validate_function(current_Token.group(2))
             if isinstance(result, LifoQueue):
                 operand_stack.put(specialFunction + result.get_nowait() + ")")
-                print("After increment" + str(i))
                 skip = True
             else:
                 return result
@@ -213,9 +214,9 @@ function_test_strings = [
     # "(6 %)",
     # Other
     # "ORE_VALUE * 2) + 20) + ORE_VALUE * 2)) ((((",
-    "32 + (47 * 900) / 90 + 20E90",
-    "(20+2+3)(90+30+30)",
-    "38 + ln(90+42+32(32)+42)",
+    # "32 + (47 * 900) / 90 + 20E90",
+    # "(20+2+3)(90+30+30)",
+    "38ln(90)",
     "ORE_VALUE(32+2)",
     "ORE_VALUE(sqrt(ORE_VALUE))",
 ]

@@ -1,9 +1,8 @@
-from typing import Union
-
 from PyQt6.QtGui import QFont
-from PyQt6.QtWidgets import QWidget, QGridLayout, QLabel
+from PyQt6.QtWidgets import QWidget, QGridLayout, QLabel, QVBoxLayout, QLayout, QGroupBox, QBoxLayout
 
 from GUI.CustomWidgets.DropDownMenu import DropDownMenu
+from GUI.JsonSerializable import JsonSerializable
 from Helper_Functions import bold_string
 
 ore_value = ("Ore Value", "ORE_VALUE")
@@ -26,20 +25,41 @@ numericOperators = [add, subtract, multiply, divide, exponent, assignment, modul
 
 class StrategyWidget(QWidget):
 
-    def __init__(self, strategyName: str):
-        super().__init__()
+    def __init__(self, strategyChoiceMenu, strategyName: str = None, layout: QBoxLayout = None,
+                 parent: QWidget = None):
+        super().__init__(parent=parent)
         self.jsonWidgets = []
-        self.layout = QGridLayout()
+        self.strategyChoice = strategyChoiceMenu.dropDownMenu
+        self.layout = QVBoxLayout()
         self.setLayout(self.layout)
+        self.masterLayout = QVBoxLayout()
+        self.groupBox = QGroupBox()
+        # self.layout = layout
+        self.groupBox.setLayout(self.layout)
+        self.masterLayout.addWidget(self.groupBox)
+        self.setLayout(self.masterLayout)
+        #
+        #
+        self.strategyName = strategyName
+        self.nameLabel = QLabel(bold_string(strategyName + ":"))
+        self.nameLabel.setFont(QFont("Arial", 16))
+        #
+        # self.layout.addWidget(self.nameLabel)
 
-        self.strategyName = QLabel(bold_string(strategyName))
-        self.strategyName.setFont(QFont("Arial", 16))
-
-        self.layout.addWidget(self.strategyName, 0, 0)
-
-    def addJsonWidget(self, jsonWidget: QWidget):
+    def addJsonWidget(self, jsonWidget: JsonSerializable):
         self.jsonWidgets.append(jsonWidget)
         self.layout.addWidget(jsonWidget)
+
+    def addWidget(self, widget: QWidget):
+        self.layout.addWidget(widget)
+
+    def setName(self, newName: str):
+        self.strategyName = newName
+        self.nameLabel.setText(bold_string(newName) + ":")
+        self.nameLabel.setFont(QFont("Arial", 16))
+
+    def addToJsonWidgetList(self, jsonWidget: JsonSerializable):
+        self.jsonWidgets.append(jsonWidget)
 
 
 def createVTMWidget():

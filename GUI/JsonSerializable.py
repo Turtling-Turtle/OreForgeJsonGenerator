@@ -1,5 +1,4 @@
 import abc
-from abc import ABC, abstractmethod
 from typing import Union
 
 from GUI.Validators.Validator import ValidationResult, Validator
