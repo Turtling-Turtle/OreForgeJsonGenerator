@@ -4,7 +4,7 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QPushButton, QGroupBox, QVBoxLayout
 
 from GUI.JsonSerializable import JsonSerializable
-from GUI.UpgradeStrategyWidgets.Constants import returnUpgradeStrategies
+from GUI.UpgradeStrategyWidgets.ConstructorDictionary import returnUpgradeStrategies
 from GUI.UpgradeStrategyWidgets.StrategyChoiceField import StrategyChoiceField
 from GUI.UpgradeStrategyWidgets.StrategyWidget import StrategyWidget
 from GUI.Validators.Validator import ValidationResult

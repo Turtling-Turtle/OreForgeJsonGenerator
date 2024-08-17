@@ -7,11 +7,20 @@ from GUI.Validators.Validator import ValidationResult, Validator
 class JsonSerializable:
     @abc.abstractmethod
     def toDict(self) -> dict:
-        pass
+        data = {}
+        for field in vars(self).values():
+            if isinstance(field, JsonSerializable):
+                data.update(field.toDict())
+        return data
 
     @abc.abstractmethod
     def validate(self) -> Union[ValidationResult, list[ValidationResult]]:
-        pass
+        results = []
+        for field in vars(self).items():
+            if isinstance(field, JsonSerializable):
+                result = field.validate()
+                results.extend(result) if isinstance(result, list) else results.append(result)
+        return results
 
 
 class CustomWidget:
@@ -24,4 +33,3 @@ class CustomWidget:
         self.validator = validator
         if self.validator:
             self.validator.setParentFieldName(fieldName)
-

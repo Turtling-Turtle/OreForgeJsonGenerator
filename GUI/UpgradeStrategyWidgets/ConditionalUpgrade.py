@@ -5,7 +5,7 @@ from PyQt6.QtWidgets import QWidget, QVBoxLayout, QCheckBox
 from GUI.CustomWidgets.CheckBoxField import CheckBoxField
 from GUI.CustomWidgets.InputField import InputField
 from GUI.JsonSerializable import JsonSerializable
-from GUI.UpgradeStrategyWidgets.Constants import returnUpgradeStrategies
+from GUI.UpgradeStrategyWidgets.ConstructorDictionary import returnUpgradeStrategies
 from GUI.UpgradeStrategyWidgets.StrategyChoiceField import StrategyChoiceField
 from GUI.UpgradeStrategyWidgets.StrategyWidget import StrategyWidget
 from GUI.Validators.ConditionValidator import ConditionValidator

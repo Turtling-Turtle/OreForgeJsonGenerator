@@ -5,7 +5,7 @@ from PyQt6.QtWidgets import QWidget, QGroupBox, QVBoxLayout
 from GUI.CustomWidgets.CheckBoxField import CheckBoxField
 from GUI.CustomWidgets.InputField import InputField
 from GUI.JsonSerializable import JsonSerializable
-from GUI.UpgradeStrategyWidgets.Constants import returnUpgradeStrategies
+from GUI.UpgradeStrategyWidgets.ConstructorDictionary import returnUpgradeStrategies
 from GUI.UpgradeStrategyWidgets.StrategyChoiceField import StrategyChoiceField
 from GUI.Validators.NumberValidator import NumberValidator
 from GUI.Validators.Validator import ValidationResult
@@ -18,37 +18,17 @@ class UpgraderWidget(QWidget, JsonSerializable):
         # self.gridBox = QGroupBox()
         self.masterLayout = QVBoxLayout()
         self.mainLayout = QVBoxLayout()
+        self.conveyorField = InputField("Conveyor Speed", NumberValidator(float), "conveyorSpeed", float)
         self.upgradeTagField = UpgradeTagWidget(ID, name)
-        self.addJsonWidget(InputField("Conveyor Speed", NumberValidator(float), "conveyorSpeed", float))
-        self.addJsonWidget(self.upgradeTagField)
         self.upgradeStrategy = StrategyChoiceField(returnUpgradeStrategies(), "Upgrade ")
-        self.addJsonWidget(self.upgradeStrategy)
+
+        for field in vars(self).values():
+            if isinstance(field, JsonSerializable):
+                self.mainLayout.addWidget(field)
 
         # self.gridBox.setLayout(self.mainLayout)
         # self.masterLayout.addWidget(self.gridBox)
         self.setLayout(self.mainLayout)
-
-    def addJsonWidget(self, widget: JsonSerializable):
-        self.jsonWidgets.append(widget)
-        self.mainLayout.addWidget(widget)
-
-    def toDict(self) -> dict:
-        info = {}
-        for widget in self.jsonWidgets:
-            info.update(widget.toDict())
-        # info.update(self.upgradeStrategy.toDict())
-        # info.update(self.upgradeTagField.toDict())
-        return info
-
-    def validate(self) -> Union[ValidationResult, list[ValidationResult]]:
-        results = []
-        for widget in self.jsonWidgets:
-            result = widget.validate()
-            if isinstance(result, list):
-                results.extend(result)
-            else:
-                results.append(result)
-        return results
 
 
 class UpgradeTagWidget(QWidget, JsonSerializable):

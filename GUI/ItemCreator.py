@@ -4,12 +4,13 @@ import sys
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QMessageBox, QApplication, QScrollArea, QPushButton
 
+from Stopwatch import Stopwatch, TimeUnit
 from GUI.AcquisitionInfo import AcquisitionInfo
 from GUI.CustomWidgets.DropDownMenu import DropDownMenu
 from GUI.ItemSpecificWidgets.UpgraderWidget import UpgraderWidget
 from GUI.JsonSerializable import JsonSerializable
-from GUI.UpgradeStrategyWidgets import Constants
-from GUI.UpgradeStrategyWidgets.Constants import returnUpgradeStrategies
+from GUI.UpgradeStrategyWidgets import ConstructorDictionary
+from GUI.UpgradeStrategyWidgets.ConstructorDictionary import returnUpgradeStrategies
 from GUI.UpgradeStrategyWidgets.StrategyChoiceField import StrategyChoiceField
 from GUI.UniversalAttributes import UniversalAttributes
 from GUI.Validators.Validator import ValidationResult
@@ -76,8 +77,11 @@ class ItemCreator(QWidget):
         self.jsonWidgets.remove(target)
 
     def generateItem(self) -> None:
+        watch = Stopwatch(TimeUnit.SECONDS)
+        watch.start()
         validationResults = self.validateFields()
         errorList = self.verifyResults(validationResults)
+        watch.print()
         if len(errorList) > 0:
             self.postError(errorList)
         else:

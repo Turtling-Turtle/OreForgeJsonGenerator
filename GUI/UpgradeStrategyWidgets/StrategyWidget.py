@@ -55,7 +55,7 @@ class StrategyWidget(QWidget):
 
     def setName(self, newName: str):
         self.strategyName = newName
-        self.nameLabel.setText(bold_string(newName) + ":")
+        self.nameLabel.setText(bold_string(newName))
         self.nameLabel.setFont(QFont("Arial", 16))
 
     def addToJsonWidgetList(self, jsonWidget: JsonSerializable):
