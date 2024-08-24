@@ -34,6 +34,8 @@ class DropperBehaviorWidget(QWidget, JsonSerializable):
         self.layout.addWidget(self.orePerMinute)
         self.layout.addWidget(self.oreInBurst)
 
+        self.setLayout(self.layout)
+
     def toDict(self) -> dict:
         data = {}
         data.update(self.orePerMinute.toDict())
@@ -56,17 +58,19 @@ class OreStatsWidget(QWidget, JsonSerializable):
             if isinstance(field, JsonSerializable):
                 self.layout.addWidget(field)
 
-    def toDict(self) -> dict:
-        info = {}
-        for field in vars(self).values():
-            if isinstance(field, JsonSerializable):
-                info.update(field.toDict())
-        return info
+        self.setLayout(self.layout)
 
-    def validate(self) -> Union[ValidationResult, list[ValidationResult]]:
-        results = []
-        for field in vars(self).values():
-            if isinstance(field, JsonSerializable):
-                result = field.validate()
-                results.extend(result) if isinstance(result, list) else results.append(result)
-        return results
+    # def toDict(self) -> dict:
+    #     info = {}
+    #     for field in vars(self).values():
+    #         if isinstance(field, JsonSerializable):
+    #             info.update(field.toDict())
+    #     return info
+    #
+    # def validate(self) -> Union[ValidationResult, list[ValidationResult]]:
+    #     results = []
+    #     for field in vars(self).values():
+    #         if isinstance(field, JsonSerializable):
+    #             result = field.validate()
+    #             results.extend(result) if isinstance(result, list) else results.append(result)
+    #     return results

@@ -12,14 +12,14 @@ from GUI.Validators.Validator import ValidationResult
 
 
 class UpgraderWidget(QWidget, JsonSerializable):
-    def __init__(self, ID: str, name: str):
+    def __init__(self, ID: str):
         super().__init__()
         self.jsonWidgets = []
         # self.gridBox = QGroupBox()
         self.masterLayout = QVBoxLayout()
         self.mainLayout = QVBoxLayout()
         self.conveyorField = InputField("Conveyor Speed", NumberValidator(float), "conveyorSpeed", float)
-        self.upgradeTagField = UpgradeTagWidget(ID, name)
+        self.upgradeTagField = UpgradeTagWidget(ID)
         self.upgradeStrategy = StrategyChoiceField(returnUpgradeStrategies(), "Upgrade ")
 
         for field in vars(self).values():
@@ -32,10 +32,10 @@ class UpgraderWidget(QWidget, JsonSerializable):
 
 
 class UpgradeTagWidget(QWidget, JsonSerializable):
-    def __init__(self, ID: str, name: str):
+    def __init__(self, ID: str):
         super().__init__()
         self.layout = QVBoxLayout()
-        self.name = name
+        self.name = ""
         self.id = ID
         self.maxUpgrades = InputField("Max Upgrades", NumberValidator(int, min_value=1), "maxUpgrades", int)
         self.isResetter = CheckBoxField("Is Resetter?", "isResetter")
@@ -54,3 +54,6 @@ class UpgradeTagWidget(QWidget, JsonSerializable):
 
     def validate(self) -> Union[ValidationResult, list[ValidationResult]]:
         return self.maxUpgrades.validate()
+
+    def setTagName(self, name: str) -> None:
+        self.name = name

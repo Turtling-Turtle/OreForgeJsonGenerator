@@ -4,14 +4,17 @@ import sys
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QMessageBox, QApplication, QScrollArea, QPushButton
 
+from CLI.Item_Constructors import generate_item_id
+from GUI.ItemSpecificWidgets.ConveyorWidget import ConveyorWidget
+from GUI.ItemSpecificWidgets.DropperWidget import DropperWidget
+from GUI.ItemSpecificWidgets.FurnaceWidget import FurnaceWidget
+from GUI.UpgradeStrategyWidgets.ConstructorDictionary import returnUpgradeStrategies
+from GUI.UpgradeStrategyWidgets.StrategyChoiceField import StrategyChoiceField
 from Stopwatch import Stopwatch, TimeUnit
 from GUI.AcquisitionInfo import AcquisitionInfo
 from GUI.CustomWidgets.DropDownMenu import DropDownMenu
 from GUI.ItemSpecificWidgets.UpgraderWidget import UpgraderWidget
 from GUI.JsonSerializable import JsonSerializable
-from GUI.UpgradeStrategyWidgets import ConstructorDictionary
-from GUI.UpgradeStrategyWidgets.ConstructorDictionary import returnUpgradeStrategies
-from GUI.UpgradeStrategyWidgets.StrategyChoiceField import StrategyChoiceField
 from GUI.UniversalAttributes import UniversalAttributes
 from GUI.Validators.Validator import ValidationResult
 
@@ -41,14 +44,12 @@ class ItemCreator(QWidget):
         self.contentLayout = QVBoxLayout(self.contentWidget)
         self.contentLayout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
-        self.addJsonWidget(UniversalAttributes())
+        self.universalAttributes = UniversalAttributes()
+        self.addJsonWidget(self.universalAttributes)
 
         self.addJsonWidget(AcquisitionInfo())
 
-        # self.addJsonWidget(
-        #     StrategyChoiceField(returnUpgradeStrategies()))
-
-        self.itemSpecificInfo = UpgraderWidget("Test", "test")
+        self.itemSpecificInfo = FurnaceWidget()
         self.addJsonWidget(self.itemSpecificInfo)
 
         self.scrollBox.setWidget(self.contentWidget)
@@ -61,14 +62,25 @@ class ItemCreator(QWidget):
         self.setLayout(self.mainLayout)
 
     def updateItemSpecificInfo(self) -> None:
-        pass
+        print("Updating Item Specific Info")
+        self.removeJsonWidget(self.itemSpecificInfo)
         # self.removeJsonWidget(self.itemSpecificInfo)
-        # if self.itemType.dropDown.currentText() == "Upgrader":
-        #     self.itemSpecificInfo = UpgraderWidget("Test", "test")
-        #     self.addJsonWidget(self.itemSpecificInfo)
+        self.universalAttributes.setItemId(generate_item_id())
+        itemType = self.itemType.dropDown.currentText()
+        if itemType == itemTypes[0][0]:  # Furnace
+            self.itemSpecificInfo = FurnaceWidget()
+        elif itemType == itemTypes[1][0]:  # Dropper
+            self.itemSpecificInfo = DropperWidget()
+        elif itemType == itemTypes[2][0]:  # Upgrader
+            self.itemSpecificInfo = UpgraderWidget(self.universalAttributes.getItemId())
+        elif itemType == itemTypes[3][0]:  # Conveyor
+            self.itemSpecificInfo = ConveyorWidget()
+
+        # self.addJsonWidget(self.itemSpecificInfo)
+        self.addJsonWidget(self.itemSpecificInfo)
+        # self.scrollBox.setWidget(self.contentWidget)
 
     def addJsonWidget(self, jsonWidget: JsonSerializable):
-        # self.contentLayout.addWidget(jsonWidget, alignment=Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
         self.contentLayout.addWidget(jsonWidget)
         self.jsonWidgets.append(jsonWidget)
 
@@ -90,9 +102,32 @@ class ItemCreator(QWidget):
     def getJSON(self) -> dict:
         data = {}
         for widget in self.jsonWidgets:
-            if isinstance(widget, JsonSerializable):
+            if isinstance(widget, UniversalAttributes):
+                data.update(widget.toDict())
+                data.update(self.getDefaultBlockLayout())
+            elif isinstance(widget, JsonSerializable):
                 data.update(widget.toDict())
         return data
+
+    def getDefaultBlockLayout(self) -> dict:
+        itemType = self.itemType.dropDown.currentText()
+        if itemType == itemTypes[0][0]:  # Furnace
+            return {"blockLayout": [[4, 4],
+                                    [4, 4]
+                                    ]}
+        elif itemType == itemTypes[1][0]:  # Dropper
+            return {"blockLayout": [[0, 3, 0],
+                                    [0, 0, 0],
+                                    [0, 0, 0]
+                                    ]}
+        elif itemType == itemTypes[2][0]:  # Upgrader
+            return {"blockLayout": [[2, 2],
+                                    [1, 1]
+                                    ]}
+        elif itemType == itemTypes[3][0]:  # Conveyor
+            return {"blockLayout": [[1, 1],
+                                    [1, 1]
+                                    ]}
 
     def validateFields(self) -> list[ValidationResult]:
         validationResults = []
